@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Primera prueba del laberinto</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+  <script defer src="{{ url_for('static', filename='inicio.js') }}"></script>
+</head>
+<body>
+  <header>
+    <div class="contenedor">
+      <p>INFO1158 · Proyecto 1</p>
+      <h1>Primera prueba del laberinto</h1>
+      <p>El servidor calcula una ruta mínima con BFS sobre los pasillos activos.</p>
+    </div>
+  </header>
+  <main class="contenedor">
+    <form id="formulario">
+      <label for="caso">Configuración de prueba</label>
+      <div class="controles">
+        <select id="caso" name="caso">
+          <option value="original">Red original</option>
+          <option value="bloqueo">Bloquear D → t</option>
+          <option value="atajo">Agregar C → t</option>
+          <option value="desconectado">Bloquear las dos entradas de t</option>
+          <option value="manual">Caso manual de seis vértices</option>
+        </select>
+        <button type="submit">Analizar</button>
+      </div>
+    </form>
+    <p id="aviso" role="status" aria-live="polite"></p>
+    <section id="resultado" hidden aria-label="Resultado del cálculo">
+      <p id="modelo"></p>
+      <div class="respuesta">
+        <div><h2>Ruta mínima</h2><p id="ruta"></p></div>
+        <div><h2>Longitud en pasillos</h2><p id="distancia"></p></div>
+      </div>
+      <p id="pendientes"></p>
+      <details>
+        <summary>Entrada enviada a Python</summary>
+        <pre id="entrada-json"></pre>
+      </details>
+      <details>
+        <summary>Respuesta del servidor</summary>
+        <pre id="salida-json"></pre>
+      </details>
+    </section>
+  </main>
+</body>
+</html>

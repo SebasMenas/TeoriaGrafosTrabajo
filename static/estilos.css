@@ -1,0 +1,29 @@
+:root {
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #17313a;
+  background: #f5f3ed;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+.contenedor { max-width: 960px; margin: auto; padding: 28px; }
+header { background: #17313a; color: white; border-bottom: 4px solid #b58a42; }
+header p { color: #d0e7de; }
+h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: -.035em; }
+h2 { margin-top: 0; font-size: 1rem; }
+label { display: block; font-weight: 650; margin-bottom: 8px; }
+.controles { display: flex; flex-wrap: wrap; gap: 12px; }
+select, button { padding: 12px; font: inherit; border: 1px solid #a7bdb5; border-radius: 5px; }
+select { min-width: 0; flex: 1; color: #17313a; background: white; }
+button { cursor: pointer; color: white; background: #096a57; font-weight: 650; }
+button:disabled { cursor: wait; opacity: .65; }
+:focus-visible { outline: 3px solid #205c9c; outline-offset: 3px; }
+#aviso { min-height: 1.5em; color: #096a57; }
+#aviso.error { color: #ae403a; }
+#modelo { color: #486069; }
+.respuesta { background: white; border-left: 4px solid #096a57; padding: 22px; display: flex; flex-wrap: wrap; gap: 24px 48px; }
+#ruta, #distancia { font-size: 1.65rem; color: #096a57; font-weight: 650; margin-bottom: 0; }
+#pendientes { line-height: 1.6; }
+details { margin-block: 16px; }
+summary { cursor: pointer; color: #205c9c; }
+pre { background: white; padding: 16px; overflow-x: auto; font-size: .85rem; line-height: 1.5; }
+@media (max-width: 450px) { .contenedor { padding: 20px; } }

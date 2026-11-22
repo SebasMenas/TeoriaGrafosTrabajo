@@ -1,0 +1,206 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-noshorthands]{babel}
+\usepackage{lmodern,amsmath,amssymb,geometry,xcolor,hyperref,booktabs,tabularx,tikz,fancyhdr,enumitem}
+\usetikzlibrary{arrows.meta}
+\geometry{left=22mm,right=22mm,top=23mm,bottom=22mm}
+\definecolor{tinta}{HTML}{17313A}
+\definecolor{verde}{HTML}{096A57}
+\definecolor{azul}{HTML}{205C9C}
+\definecolor{oro}{HTML}{B58A42}
+\definecolor{gris}{HTML}{51656D}
+\definecolor{fondo}{HTML}{EAF4EF}
+\hypersetup{colorlinks=true,urlcolor=azul,linkcolor=verde,citecolor=azul,
+  pdftitle={Laberintos y rutas alternativas},
+  pdfsubject={Modelación de una red dirigida y búsqueda de caminos mínimos},
+  pdfauthor={Gustavo Martínez, Ariel Díaz, Cristian Cáceres y Sebastián Mena},pdflang={es-CL}}
+\renewcommand{\familydefault}{\sfdefault}
+\color{tinta}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\setlength{\headheight}{14pt}
+\setlength{\emergencystretch}{2em}
+\renewcommand{\arraystretch}{1.24}
+\setlist[enumerate]{leftmargin=6mm,itemsep=2pt,topsep=3pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{gris}INFO1158 / Teoría de Grafos}
+\fancyhead[R]{\small\color{gris}Laberintos y rutas alternativas}
+\fancyfoot[R]{\small\color{verde}\thepage}
+\renewcommand{\headrulewidth}{.3pt}
+\newcommand{\tema}[1]{\section*{\color{verde}#1}}
+\newcommand{\ruta}[1]{\textcolor{verde}{\ensuremath{#1}}}
+\newcommand{\alternativa}[1]{\textcolor{azul}{\ensuremath{#1}}}
+\newcommand{\titulo}[1]{{\fontsize{27}{30}\selectfont\bfseries #1\par}\vspace{6pt}}
+\begin{document}
+\pdfbookmark[0]{Laberintos y rutas alternativas}{inicio}
+{\fontsize{30}{33}\selectfont\bfseries Laberintos y\\rutas alternativas\par}
+\vspace{5pt}
+{\large\color{verde}Modelación y búsqueda de caminos en una red dirigida}\par
+{\small Gustavo Martínez, Ariel Díaz, Cristian Cáceres y Sebastián Mena}\par
+{\small\color{gris}Proyecto 1 / 22 de noviembre de 2026}\par
+\vspace{2pt}
+{\color{oro}\rule{\linewidth}{1.2pt}}
+
+\tema{Problema y objetivos}
+Un robot de inspección se desplaza entre espacios de un centro de almacenamiento mediante pasillos de sentido único. Cada inspección comienza en una entrada $s$ y termina en una salida $t$. La longitud del recorrido corresponde a la cantidad de pasillos utilizados.
+
+El análisis considera tres objetivos. Primero, determinar un camino con el menor número de arcos. Segundo, encontrar la máxima cantidad de caminos que puedan coexistir sin compartir pasillos. Tercero, identificar un conjunto mínimo de pasillos cuya eliminación impida llegar a la salida. Estos objetivos permiten estudiar la eficiencia de los recorridos y la conectividad ante bloqueos.~\cite{enunciado}
+
+\tema{Modelo matemático}
+La configuración inicial se representa mediante el grafo dirigido $G_0=(V,E_0)$, donde
+\[
+ V=\{s,A,B,C,D,E,F,G,H,I,t\},\qquad |V|=11,\quad |E_0|=18.
+\]
+Los vértices representan espacios o intersecciones. Cada par ordenado $(u,v)$ representa un pasillo recorrible desde $u$ hasta $v$. La tabla define el conjunto $E_0$ mediante las listas de destinos de cada origen.
+
+\begin{center}
+\begin{tabular}{cl@{\hspace{17mm}}cl}
+\toprule
+\textbf{Origen} & \textbf{Destinos} & \textbf{Origen} & \textbf{Destinos}\\\midrule
+$s$ & $A,B,C$ & $F$ & $I$\\
+$A$ & $D,E$ & $G$ & $E,H$\\
+$B$ & $E,F$ & $H$ & $I$\\
+$C$ & $G,H$ & $I$ & $t$\\
+$D$ & $t,F$ & $t$ & $\varnothing$\\
+$E$ & $D,H$ & & \\\bottomrule
+\end{tabular}
+\end{center}
+
+Los extremos de cada arco son distintos y los pares ordenados son únicos. Ningún arco aparece junto con su recíproco. Todos los vértices tienen al menos un arco incidente. El orden y el tamaño cumplen los rangos de la configuración inicial. Además, los caminos
+\[
+ \ruta{s\to A\to D\to t},\qquad \alternativa{s\to B\to F\to I\to t}
+\]
+utilizan conjuntos de arcos disjuntos. Esta familia certifica la existencia de al menos dos alternativas independientes.
+
+\newpage
+\pdfbookmark[1]{Representación y camino mínimo}{camino}
+\titulo{Representación y camino mínimo}
+\begin{center}
+\begin{tikzpicture}[x=1.1cm,y=1.1cm,
+ n/.style={circle,draw=tinta,fill=white,minimum size=7.5mm,inner sep=0pt,font=\small\bfseries},
+ a/.style={-{Stealth[length=2.6mm,width=1.8mm]},draw=tinta!45,line width=.75pt}]
+\node[n,fill=verde!12,draw=verde] (s) at (0,1.6) {$s$};
+\node[n] (A) at (2.2,3.1) {A};
+\node[n] (B) at (2.2,1.6) {B};
+\node[n] (C) at (2.2,.1) {C};
+\node[n] (E) at (4.4,2.1) {E};
+\node[n] (G) at (4.4,.7) {G};
+\node[n] (D) at (6.4,3.1) {D};
+\node[n] (F) at (6.4,1.6) {F};
+\node[n] (H) at (6.4,.1) {H};
+\node[n] (I) at (8.6,.9) {I};
+\node[n,fill=azul!12,draw=azul] (t) at (10.8,2.4) {$t$};
+\foreach \u/\v in {s/C,A/E,B/E,C/G,C/H,D/F,E/D,E/H,G/E,G/H,H/I} {\draw[a] (\u) -- (\v);}
+\foreach \u/\v in {s/A,A/D,D/t} {\draw[a,draw=verde,line width=1.6pt] (\u) -- (\v);}
+\foreach \u/\v in {s/B,B/F,F/I,I/t} {\draw[a,draw=azul,line width=1.6pt] (\u) -- (\v);}
+\end{tikzpicture}\par
+\vspace{3pt}
+{\small\color{gris}\textbf{Figura 1.} Red inicial. Verde y azul identifican dos caminos sin arcos compartidos.}
+\end{center}
+
+La posición y la separación de los vértices organizan la representación visual. El modelo conserva las relaciones y los sentidos definidos en $E_0$. Los cruces de líneas que carecen de un nodo dibujado representan intersecciones gráficas.
+
+\tema{Búsqueda en anchura}
+La búsqueda en anchura, BFS, explora los vértices por capas de distancia mediante una cola FIFO. Para cada vértice descubierto, almacena su distancia desde $s$ y el vértice predecesor que permitió alcanzarlo.~\cite{mitbfs}
+
+\begin{enumerate}
+\item La entrada ingresa a la cola con distancia cero y predecesor nulo.
+\item Se extrae el primer vértice y se revisan sus vecinos de salida activos.
+\item Cada vecino nuevo recibe distancia anterior más uno, registra su predecesor e ingresa al final de la cola.
+\item Al terminar la exploración, los predecesores permiten reconstruir el camino desde $t$ y después invertir su orden.
+\end{enumerate}
+
+En la red inicial se obtienen las capas
+\[
+\begin{aligned}
+ L_0&=\{s\}, & L_1&=\{A,B,C\},\\
+ L_2&=\{D,E,F,G,H\}, & L_3&=\{t,I\}.
+\end{aligned}
+\]
+La cadena de predecesores de $t$ permite recuperar \ruta{s\to A\to D\to t}. Tiene tres arcos. Ninguno de los vecinos de $s$ llega directamente a $t$, por lo que una ruta de dos arcos es imposible.
+
+\tema{Garantía de longitud mínima}
+BFS procesa las capas en orden creciente. Un vértice descubierto desde la capa $i$ recibe distancia $i+1$. Si existiera una ruta más corta, una capa anterior ya lo habría descubierto. Con listas de adyacencia, la exploración completa cuesta $O(|V|+|E|)$ y utiliza $O(|V|)$ de memoria auxiliar.
+
+\newpage
+\pdfbookmark[1]{Algoritmos e implementación}{implementacion}
+\titulo{Algoritmos e implementación}
+\tema{Selección de la búsqueda}
+Tanto BFS como la búsqueda en profundidad, DFS, permiten explorar vértices alcanzables. Su orden de exploración determina las garantías del camino obtenido.~\cite{mitbfs,mitdfs}
+
+{\small
+\begin{tabularx}{\linewidth}{@{}p{.17\linewidth}XX@{}}
+\toprule
+\textbf{Estrategia} & \textbf{Exploración} & \textbf{Camino obtenido}\\\midrule
+BFS / anchura & Cola FIFO y capas de distancia creciente. & Mínimo en cantidad de arcos.\\
+DFS / profundidad & Pila o recursión para continuar una rama antes de retroceder. & Depende del orden de visita y puede ser más largo.\\\bottomrule
+\end{tabularx}}
+
+Con listas de adyacencia, ambas búsquedas tienen costo $O(|V|+|E|)$ para una exploración completa. Se selecciona BFS porque todos los pasillos aportan una unidad a la longitud. Por ejemplo, DFS podría visitar primero $s\to A\to E\to H\to I\to t$, de cinco arcos, si prioriza esos vecinos. BFS obtiene una ruta de tres arcos en la misma red.
+
+\tema{Organización del programa}
+{\small
+\begin{tabularx}{\linewidth}{@{}p{.28\linewidth}X@{}}
+\toprule
+\textbf{Componente} & \textbf{Responsabilidad}\\\midrule
+\texttt{casos.json} & Almacena vértices, inventario de pasillos y extremos de las redes original y manual.\\
+\texttt{modelo.py} & Carga las redes y valida nombres, extremos, lazos, duplicados y recíprocos.\\
+\texttt{algoritmos.py} & Implementa BFS, reconstruye el camino y prepara la respuesta de \texttt{resolver}.\\
+\texttt{app.py} & Expone el servidor Flask y el análisis mediante \texttt{POST /analizar}.\\
+\texttt{templates/}, \texttt{static/} & Presentan los escenarios y muestran la respuesta del servidor.\\
+\texttt{tests/} & Reúne las comprobaciones automatizadas del modelo, la búsqueda y la API.\\\bottomrule
+\end{tabularx}}
+
+Flask conecta las rutas HTTP con las funciones de análisis y sirve la página del navegador.~\cite{flask} Los pasillos bloqueados permanecen en el inventario y se omiten al construir las listas de vecinos activos. Esto permite validar duplicados y recíprocos considerando también las conexiones que podrían restablecerse. Los límites de cantidad y la ausencia de aislados se revisan al cargar la configuración inicial.
+
+\tema{Contrato de análisis}
+Cada solicitud incluye el grafo y sus extremos. BFS calcula los campos \texttt{ruta} y \texttt{distancia}. En los casos conectados, \texttt{caminos}, \texttt{maximo} y \texttt{corte} se devuelven como \texttt{null}, y \texttt{calculos\_pendientes} identifica el análisis de rutas disjuntas y corte mínimo que aún requiere implementación.
+
+Si $t$ es inalcanzable, la ruta y distancia carecen de valor, la cantidad de caminos es cero y el corte es el conjunto vacío. Los datos inválidos producen HTTP 400 y un mensaje de error. La página permite consultar tanto la entrada JSON como la respuesta calculada.
+
+\newpage
+\pdfbookmark[1]{Resultados y verificación}{resultados}
+\titulo{Resultados y verificación}
+Las modificaciones se aplican de manera independiente a la red original. En todos los casos se mantienen $s$ como entrada y $t$ como salida.
+
+{\small
+\begin{tabularx}{\linewidth}{@{}p{.34\linewidth}Xc@{}}
+\toprule
+\textbf{Configuración} & \textbf{Camino mínimo} & \textbf{Longitud}\\\midrule
+Red original & \ruta{s\to A\to D\to t} & 3\\
+Bloquear $D\to t$ & \ruta{s\to B\to F\to I\to t} & 4\\
+Agregar $C\to t$ & \ruta{s\to C\to t} & 2\\
+Bloquear las dos entradas de $t$ & Sin camino disponible & Sin valor\\\bottomrule
+\end{tabularx}}
+
+\tema{Interpretación de los cambios}
+\textbf{Bloqueo.} Al eliminar $D\to t$, todo camino debe llegar primero a $I$, cuyo acceso más corto requiere tres arcos desde $s$. La entrada a $t$ agrega un arco y la distancia pasa a cuatro.
+
+\textbf{Atajo.} Agregar $C\to t$ crea un camino de dos arcos. Como el modelo carece de $s\to t$, una ruta de un solo arco es imposible y la nueva distancia es mínima.
+
+\textbf{Desconexión.} Al bloquear $D\to t$ e $I\to t$, la salida queda sin arcos de entrada activos. No existe camino dirigido desde $s$ y el conjunto vacío ya cumple la condición de corte.
+
+\tema{Comprobación del cálculo}
+La suite automatizada verifica las distancias, la reconstrucción de los caminos y el certificado de dos alternativas iniciales. También comprueba bloqueos y restablecimientos, ciclos, cambio de extremos, conservación de los datos de entrada y errores HTTP.
+
+El caso independiente guardado como \texttt{manual} contiene seis vértices y siete arcos. Desde $s$ se llega a $a$ o $b$ en el primer paso, y a $c$ o $d$ en el segundo. Estos últimos son los únicos predecesores de $t$. El camino de tres arcos que obtiene BFS es mínimo,
+\[
+\ruta{s\to a\to c\to t}.
+\]
+
+\tema{Código y referencias}
+El repositorio aloja el código fuente, las dependencias y las instrucciones de ejecución y verificación.\par
+\url{https://github.com/SebasMenas/TeoriaGrafosTrabajo}
+
+{\small
+\renewcommand{\refname}{}
+\begin{thebibliography}{9}
+\vspace{-7mm}
+\bibitem{enunciado} INFO1158 (2026). \emph{Proyecto 1. Simulador interactivo de laberintos y rutas alternativas}. Enunciado del proyecto, pp. 2--5.
+\bibitem{mitbfs} Demaine, E., Ku, J. y Solomon, J. (2020). \emph{Lecture 9. Breadth-First Search}. MIT 6.006. \href{https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/196a95604877d326c6586e60477b59d4_MIT6_006S20_lec9.pdf}{Apuntes de BFS}.
+\bibitem{mitdfs} Demaine, E., Ku, J. y Solomon, J. (2020). \emph{Lecture 10. Depth-First Search}. MIT 6.006. \href{https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/f3e349e0eb3288592289d2c81e0c4f4d_MIT6_006S20_lec10.pdf}{Apuntes de DFS}.
+\bibitem{flask} Pallets. \emph{Flask Documentation. Quickstart}. \href{https://flask.palletsprojects.com/en/stable/quickstart/}{Documentación técnica}.
+\end{thebibliography}}
+\end{document}
