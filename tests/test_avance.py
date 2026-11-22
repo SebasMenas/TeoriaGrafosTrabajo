@@ -36,8 +36,8 @@ class PruebasDelAvance(unittest.TestCase):
         resultado = resolver(self.grafo)
         self.assertEqual(resultado["ruta"], ["s", "A", "D", "t"])
         self.assertEqual(resultado["distancia"], 3)
-        self.assertIsNone(resultado["maximo"])
-        self.assertEqual(resultado["calculos_pendientes"], ["rutas_disjuntas", "corte_minimo"])
+        self.assertEqual(resultado["maximo"], 2)
+        self.assertEqual(resultado["calculos_pendientes"], [])
 
     def test_bloqueo_restablecimiento_y_atajo(self):
         pasillo = next(a for a in self.grafo["arcos"] if (a["origen"], a["destino"]) == ("D", "t"))
