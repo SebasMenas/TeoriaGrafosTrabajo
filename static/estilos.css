@@ -26,4 +26,30 @@ button:disabled { cursor: wait; opacity: .65; }
 details { margin-block: 16px; }
 summary { cursor: pointer; color: #205c9c; }
 pre { background: white; padding: 16px; overflow-x: auto; font-size: .85rem; line-height: 1.5; }
+
+#plano { margin-block: 24px; padding: 18px; background: white; border: 1px solid #d8d2c4; border-radius: 8px; }
+.plano-cabecera { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #b58a42; }
+#plano h2 { margin: 0; font-size: 1.1rem; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; font-size: .9rem; color: #486069; }
+.leyenda li { display: flex; align-items: center; gap: 6px; }
+.muestra { display: inline-block; width: 18px; height: 18px; border-radius: 50%; }
+.muestra-entrada { background: #096a57; }
+.muestra-salida { background: #205c9c; }
+.muestra-bloqueado { width: 22px; height: 0; border-radius: 0; border-top: 3px dashed #a9b7b2; }
+#plano-svg { display: block; width: 100%; height: auto; background: #fbfaf6; border: 1px solid #e2ddd2; border-radius: 6px; }
+.arco { stroke: #4b5d64; stroke-width: 1.1; fill: none; }
+.arco.bloqueado { stroke: #a9b7b2; stroke-dasharray: 6 5; }
+.punta-activa { fill: #4b5d64; }
+.punta-bloqueada { fill: #a9b7b2; }
+.vertice circle { fill: #17313a; stroke: #0d1f26; stroke-width: 1.5; }
+.vertice.entrada circle { fill: #096a57; stroke: #064a3d; }
+.vertice.salida circle { fill: #205c9c; stroke: #16406d; }
+.vertice text { fill: white; font-size: 14px; font-weight: 650; pointer-events: none; }
+.plano-aviso { min-height: 1.3em; margin: 10px 0 0; font-size: .9rem; color: #486069; }
+
+/* Reservadas para resaltar resultados en T11; vacías a propósito. */
+.ruta { }
+.familia { }
+.corte { }
+
 @media (max-width: 450px) { .contenedor { padding: 20px; } }

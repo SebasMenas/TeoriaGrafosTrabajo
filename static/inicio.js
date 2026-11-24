@@ -28,6 +28,8 @@ async function analizar() {
     if (!carga.ok) throw new Error('No se pudo cargar la configuración.');
     const grafo = await carga.json();
     modificarCaso(grafo, caso);
+    // Se dibuja antes de analizar para que el plano exista aunque falle la API.
+    Plano.dibujarRed(grafo, { caso });
 
     const respuesta = await fetch('/analizar', {
       method: 'POST',
