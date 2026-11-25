@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Primera prueba del laberinto</title>
+  <title>Editor de la red de pasillos</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
   <script defer src="{{ url_for('static', filename='js/posiciones.js') }}"></script>
   <script defer src="{{ url_for('static', filename='js/grafo.js') }}"></script>
@@ -13,96 +13,145 @@
   <header>
     <div class="contenedor">
       <p>INFO1158 · Proyecto 1</p>
-      <h1>Primera prueba del laberinto</h1>
-      <p>El servidor calcula una ruta mínima con BFS sobre los pasillos activos.</p>
+      <h1>Editor de la red de pasillos</h1>
+      <p>Edita la red y compara su ruta mínima, sus rutas disjuntas y su corte mínimo.</p>
     </div>
   </header>
   <main class="contenedor">
-    <form id="formulario">
-      <label for="caso">Configuración de prueba</label>
-      <div class="controles">
-        <select id="caso" name="caso">
-          <option value="original">Red original</option>
-          <option value="bloqueo">Bloquear D → t</option>
-          <option value="atajo">Agregar C → t</option>
-          <option value="desconectado">Bloquear las dos entradas de t</option>
-          <option value="manual">Caso manual de seis vértices</option>
-        </select>
-        <button type="submit">Analizar</button>
-      </div>
-    </form>
-    <section id="plano" aria-labelledby="plano-titulo">
-      <div class="plano-cabecera">
-        <h2 id="plano-titulo">Plano dirigido de la red</h2>
-        <ul class="leyenda">
-          <li><span class="muestra muestra-entrada" aria-hidden="true"></span>Entrada</li>
-          <li><span class="muestra muestra-salida" aria-hidden="true"></span>Salida</li>
-          <li><span class="muestra muestra-bloqueado" aria-hidden="true"></span>Pasillo bloqueado</li>
-          <li><span class="muestra muestra-ruta" aria-hidden="true"></span>Ruta mínima</li>
-          <li><span class="muestra muestra-familia" aria-hidden="true"></span>Rutas disjuntas</li>
-          <li><span class="muestra muestra-corte" aria-hidden="true"></span>Corte mínimo</li>
-        </ul>
-      </div>
-      <div class="plano-controles">
-        <span class="plano-controles-etiqueta">Resaltar en el plano:</span>
-        <div class="botones-vista" role="group" aria-label="Modo de visualización en el plano">
-          <button type="button" class="btn-vista activo" data-modo="ruta">Ruta mínima</button>
-          <button type="button" class="btn-vista" data-modo="familia">Rutas disjuntas</button>
-          <button type="button" class="btn-vista" data-modo="corte">Corte mínimo</button>
-          <button type="button" class="btn-vista" data-modo="limpio">Sin resaltes</button>
+    <section class="tarjeta configuracion" aria-labelledby="configuracion-titulo">
+      <div class="titulo-seccion">
+        <span class="paso" aria-hidden="true">1</span>
+        <div>
+          <h2 id="configuracion-titulo">Elige la red de trabajo</h2>
+          <p>Parte de un caso guardado. Restaurar descarta todos los cambios locales.</p>
         </div>
       </div>
-      <svg id="plano-svg" viewBox="0 0 620 220" role="img" aria-labelledby="plano-svg-titulo">
-        <title id="plano-svg-titulo">Plano dirigido de la red</title>
-        <defs>
-          <marker id="flecha-activa" viewBox="0 0 10 8" refX="10" refY="4"
-                  markerWidth="10" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
-            <path class="punta-activa" d="M0,0 L10,4 L0,8 Z"></path>
-          </marker>
-          <marker id="flecha-bloqueada" viewBox="0 0 10 8" refX="10" refY="4"
-                  markerWidth="10" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
-            <path class="punta-bloqueada" d="M0,0 L10,4 L0,8 Z"></path>
-          </marker>
-          <marker id="flecha-ruta" viewBox="0 0 10 8" refX="10" refY="4"
-                  markerWidth="10" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
-            <path class="punta-ruta" d="M0,0 L10,4 L0,8 Z"></path>
-          </marker>
-          <marker id="flecha-familia" viewBox="0 0 10 8" refX="10" refY="4"
-                  markerWidth="10" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
-            <path class="punta-familia" d="M0,0 L10,4 L0,8 Z"></path>
-          </marker>
-          <marker id="flecha-familia-alt" viewBox="0 0 10 8" refX="10" refY="4"
-                  markerWidth="10" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
-            <path class="punta-familia-alt" d="M0,0 L10,4 L0,8 Z"></path>
-          </marker>
-          <marker id="flecha-corte" viewBox="0 0 10 8" refX="10" refY="4"
-                  markerWidth="10" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
-            <path class="punta-corte" d="M0,0 L10,4 L0,8 Z"></path>
-          </marker>
-        </defs>
-        <g id="capa-arcos"></g>
-        <g id="capa-vertices"></g>
-      </svg>
-      <p id="plano-aviso" class="plano-aviso" role="status"></p>
+      <form id="formulario-caso">
+        <div class="controles">
+          <select id="caso" name="caso" aria-label="Configuración base">
+            <option value="original">Red original</option>
+            <option value="manual">Caso manual de seis vértices</option>
+          </select>
+          <button type="submit" id="restaurar" class="boton-secundario">Restaurar red original</button>
+        </div>
+      </form>
     </section>
+
     <p id="aviso" role="status" aria-live="polite"></p>
-    <section id="resultado" hidden aria-label="Resultado del cálculo">
-      <p id="modelo"></p>
-      <div class="respuesta">
-        <div><h2>Ruta mínima</h2><p id="ruta"></p></div>
-        <div><h2>Longitud en pasillos</h2><p id="distancia"></p></div>
-        <div><h2>Rutas disjuntas</h2><p id="maximo"></p><div id="lista-caminos" class="lista-detalles"></div></div>
-        <div><h2>Corte mínimo</h2><p id="tamano-corte"></p><div id="lista-corte" class="lista-detalles"></div></div>
+
+    <div class="espacio-trabajo">
+      <section id="plano" class="tarjeta" aria-labelledby="plano-titulo">
+        <div class="plano-cabecera">
+          <div>
+            <span class="paso" aria-hidden="true">2</span>
+            <h2 id="plano-titulo">Plano de la red</h2>
+          </div>
+          <ul class="leyenda">
+            <li><span class="muestra muestra-entrada" aria-hidden="true"></span>Entrada</li>
+            <li><span class="muestra muestra-salida" aria-hidden="true"></span>Salida</li>
+            <li><span class="muestra muestra-bloqueado" aria-hidden="true"></span>Bloqueado</li>
+          </ul>
+        </div>
+        <p class="ayuda-plano">Haz clic en un pasillo para bloquearlo o restablecerlo.</p>
+        <svg id="plano-svg" viewBox="0 0 620 220" role="img" aria-labelledby="plano-svg-titulo">
+          <title id="plano-svg-titulo">Plano dirigido de la red</title>
+          <defs>
+            <marker id="flecha-activa" viewBox="0 0 10 8" refX="10" refY="4"
+                    markerWidth="10" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+              <path class="punta-activa" d="M0,0 L10,4 L0,8 Z"></path>
+            </marker>
+            <marker id="flecha-bloqueada" viewBox="0 0 10 8" refX="10" refY="4"
+                    markerWidth="10" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+              <path class="punta-bloqueada" d="M0,0 L10,4 L0,8 Z"></path>
+            </marker>
+          </defs>
+          <g id="capa-arcos"></g>
+          <g id="capa-vertices"></g>
+        </svg>
+        <p id="plano-aviso" class="plano-aviso" role="status"></p>
+      </section>
+
+      <section id="resultado" class="tarjeta" aria-labelledby="resultado-titulo">
+        <div class="resultado-cabecera">
+          <div>
+            <span class="paso" aria-hidden="true">3</span>
+            <h2 id="resultado-titulo">Analiza los cambios</h2>
+          </div>
+          <button type="button" id="recalcular">Recalcular</button>
+        </div>
+        <p id="estado-resultado" role="status" aria-live="polite"></p>
+        <p id="modelo"></p>
+        <div class="respuesta">
+          <div><h3>Ruta mínima</h3><p id="ruta"></p></div>
+          <div><h3>Distancia</h3><p id="distancia"></p></div>
+          <div><h3>Rutas disjuntas</h3><p id="maximo"></p><div id="lista-caminos" class="lista-detalles"></div></div>
+          <div><h3>Corte mínimo</h3><p id="tamano-corte"></p><div id="lista-corte" class="lista-detalles"></div></div>
+        </div>
+        <p id="pendientes"></p>
+        <details>
+          <summary>Entrada enviada a Python</summary>
+          <pre id="entrada-json"></pre>
+        </details>
+        <details>
+          <summary>Respuesta del servidor</summary>
+          <pre id="salida-json"></pre>
+        </details>
+      </section>
+    </div>
+
+    <section id="editor-pasillos" class="tarjeta" aria-labelledby="editor-titulo">
+      <div class="edicion-cabecera">
+        <div class="titulo-seccion">
+          <span class="paso" aria-hidden="true">4</span>
+          <div>
+            <h2 id="editor-titulo">Bloquea o restablece pasillos</h2>
+            <p>Usa el plano o los interruptores. Un pasillo bloqueado sigue formando parte de la red.</p>
+          </div>
+        </div>
       </div>
-      <p id="pendientes"></p>
-      <details>
-        <summary>Entrada enviada a Python</summary>
-        <pre id="entrada-json"></pre>
-      </details>
-      <details>
-        <summary>Respuesta del servidor</summary>
-        <pre id="salida-json"></pre>
-      </details>
+      <div id="lista-arcos" class="lista-arcos" aria-label="Inventario de pasillos"></div>
+    </section>
+
+    <section id="editor-red" class="tarjeta" aria-labelledby="editor-red-titulo">
+      <div class="titulo-seccion">
+        <span class="paso" aria-hidden="true">5</span>
+        <div>
+          <h2 id="editor-red-titulo">Agrega pasillos o cambia los extremos</h2>
+          <p>Después de cada edición, vuelve al paso 3 y pulsa “Recalcular”.</p>
+        </div>
+      </div>
+      <div class="formularios-edicion">
+        <form id="formulario-arco" class="formulario-edicion" novalidate>
+          <h3>Agregar arco</h3>
+          <div class="controles">
+            <div class="campo">
+              <label for="arco-origen">Origen</label>
+              <select id="arco-origen" aria-describedby="error-arco"></select>
+            </div>
+            <div class="campo">
+              <label for="arco-destino">Destino</label>
+              <select id="arco-destino" aria-describedby="error-arco"></select>
+            </div>
+            <button type="submit">Agregar</button>
+          </div>
+          <p id="error-arco" class="error-control" role="alert"></p>
+        </form>
+        <form id="formulario-extremos" class="formulario-edicion" novalidate>
+          <h3>Cambiar entrada y salida</h3>
+          <div class="controles">
+            <div class="campo">
+              <label for="extremo-entrada">Entrada (s)</label>
+              <select id="extremo-entrada" aria-describedby="error-extremos"></select>
+            </div>
+            <div class="campo">
+              <label for="extremo-salida">Salida (t)</label>
+              <select id="extremo-salida" aria-describedby="error-extremos"></select>
+            </div>
+            <button type="submit">Cambiar extremos</button>
+          </div>
+          <p id="error-extremos" class="error-control" role="alert"></p>
+        </form>
+      </div>
     </section>
   </main>
 </body>

@@ -51,6 +51,21 @@ function dibujarArco(arco, posiciones) {
   return linea;
 }
 
+// Coloca la palabra “bloqueado” junto al arco para no depender solo del color.
+function dibujarEtiquetaBloqueado(arco, posiciones) {
+  const desde = posiciones[arco.origen];
+  const hasta = posiciones[arco.destino];
+  const etiqueta = crearEtiqueta('text', {
+    x: (desde.x + hasta.x) / 2,
+    y: (desde.y + hasta.y) / 2 - 7,
+    class: 'etiqueta-bloqueado',
+    'text-anchor': 'middle',
+    'pointer-events': 'none'
+  });
+  etiqueta.textContent = 'bloqueado';
+  return etiqueta;
+}
+
 // Dibuja un vértice relleno y con etiqueta; entrada y salida usan otra clase.
 function dibujarVertice(nombre, posicion, esEntrada, esSalida) {
   const clases = ['vertice'];
@@ -181,7 +196,14 @@ function dibujarRed(grafo, opciones = {}) {
 
   for (const arco of grafo.arcos) {
     const linea = dibujarArco(arco, posiciones);
-    if (linea) capaArcos.append(linea);
+    if (!linea) continue;
+    if (typeof opciones.alSeleccionarArco === 'function') {
+      linea.addEventListener('click', () => opciones.alSeleccionarArco(arco.origen, arco.destino));
+    }
+    capaArcos.append(linea);
+    if (arco.activo === false) {
+      capaArcos.append(dibujarEtiquetaBloqueado(arco, posiciones));
+    }
   }
   for (const nombre of grafo.vertices) {
     const posicion = posiciones[nombre];
@@ -202,7 +224,9 @@ function dibujarRed(grafo, opciones = {}) {
 
 // Busca un elemento arco en el SVG mediante sus atributos de origen y destino.
 function obtenerElementoArco(origen, destino) {
-  return document.querySelector(`#capa-arcos line[data-origen="${origen}"][data-destino="${destino}"]`);
+  return Array.from(document.querySelectorAll('#capa-arcos line')).find(linea => (
+    linea.dataset.origen === origen && linea.dataset.destino === destino
+  )) || null;
 }
 
 // Remueve las clases de resalte y restablece el marcador original de cada arco.
