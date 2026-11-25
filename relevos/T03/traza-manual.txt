@@ -1,0 +1,9 @@
+Camino residual: s -> a -> c -> t; paso s -> a; antes: capacidad a->c=1, c->a=0
+Camino residual: s -> a -> c -> t; paso a -> c; antes: capacidad a->c=1, c->a=0
+Camino residual: s -> a -> c -> t; paso c -> t; antes: capacidad a->c=0, c->a=1
+Camino residual: s -> b -> c -> a -> d -> t; paso s -> b; antes: capacidad a->c=0, c->a=1
+Camino residual: s -> b -> c -> a -> d -> t; paso b -> c; antes: capacidad a->c=0, c->a=1
+Camino residual: s -> b -> c -> a -> d -> t; paso c -> a; antes: capacidad a->c=0, c->a=1
+Camino residual: s -> b -> c -> a -> d -> t; paso a -> d; antes: capacidad a->c=1, c->a=0
+Camino residual: s -> b -> c -> a -> d -> t; paso d -> t; antes: capacidad a->c=1, c->a=0
+Resultado manual: {"ruta": ["s", "a", "c", "t"], "distancia": 3, "caminos": [["s", "a", "d", "t"], ["s", "b", "c", "t"]], "maximo": 2, "corte": [["s", "a"], ["s", "b"]], "calculos_pendientes": []}

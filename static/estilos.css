@@ -39,8 +39,8 @@ pre { background: white; padding: 16px; overflow-x: auto; font-size: .85rem; lin
 #plano-svg { display: block; width: 100%; height: auto; background: #fbfaf6; border: 1px solid #e2ddd2; border-radius: 6px; }
 .arco { stroke: #4b5d64; stroke-width: 1.1; fill: none; }
 .arco.bloqueado { stroke: #a9b7b2; stroke-dasharray: 6 5; }
-.punta-activa { fill: #4b5d64; }
-.punta-bloqueada { fill: #a9b7b2; }
+.punta-activa { fill: #f28c28; }
+.punta-bloqueada { fill: #f28c28; }
 .vertice circle { fill: #17313a; stroke: #0d1f26; stroke-width: 1.5; }
 .vertice.entrada circle { fill: #096a57; stroke: #064a3d; }
 .vertice.salida circle { fill: #205c9c; stroke: #16406d; }

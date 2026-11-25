@@ -1,0 +1,13 @@
+25/11/2026. Servidor WSGI local temporal usando la copia de avance/ariel-flujo d1e0904.
+PASA: original
+PASA: bloqueo
+PASA: atajo
+PASA: manual
+PASA: sin-conexion
+PASA: lazo
+PASA: duplicado
+PASA: reciproco
+PASA: extremos-iguales
+PASA: json-malformado
+PASA: caso-inexistente
+11 comprobaciones HTTP correctas. Registrar el commit del servidor y el revisor.

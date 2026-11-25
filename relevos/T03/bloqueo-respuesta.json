@@ -1,0 +1,27 @@
+{
+  "calculos_pendientes": [],
+  "caminos": [
+    [
+      "s",
+      "B",
+      "F",
+      "I",
+      "t"
+    ]
+  ],
+  "corte": [
+    [
+      "I",
+      "t"
+    ]
+  ],
+  "distancia": 4,
+  "maximo": 1,
+  "ruta": [
+    "s",
+    "B",
+    "F",
+    "I",
+    "t"
+  ]
+}

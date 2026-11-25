@@ -1,0 +1,508 @@
+[
+  {
+    "nombre": "lazo",
+    "metodo": "POST",
+    "url": "/analizar",
+    "entrada": {
+      "vertices": [
+        "s",
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "t"
+      ],
+      "entrada": "s",
+      "salida": "t",
+      "arcos": [
+        {
+          "origen": "s",
+          "destino": "A",
+          "activo": true
+        },
+        {
+          "origen": "s",
+          "destino": "B",
+          "activo": true
+        },
+        {
+          "origen": "s",
+          "destino": "C",
+          "activo": true
+        },
+        {
+          "origen": "A",
+          "destino": "D",
+          "activo": true
+        },
+        {
+          "origen": "A",
+          "destino": "E",
+          "activo": true
+        },
+        {
+          "origen": "B",
+          "destino": "E",
+          "activo": true
+        },
+        {
+          "origen": "B",
+          "destino": "F",
+          "activo": true
+        },
+        {
+          "origen": "C",
+          "destino": "G",
+          "activo": true
+        },
+        {
+          "origen": "C",
+          "destino": "H",
+          "activo": true
+        },
+        {
+          "origen": "D",
+          "destino": "t",
+          "activo": true
+        },
+        {
+          "origen": "D",
+          "destino": "F",
+          "activo": true
+        },
+        {
+          "origen": "E",
+          "destino": "D",
+          "activo": true
+        },
+        {
+          "origen": "E",
+          "destino": "H",
+          "activo": true
+        },
+        {
+          "origen": "F",
+          "destino": "I",
+          "activo": true
+        },
+        {
+          "origen": "G",
+          "destino": "E",
+          "activo": true
+        },
+        {
+          "origen": "G",
+          "destino": "H",
+          "activo": true
+        },
+        {
+          "origen": "H",
+          "destino": "I",
+          "activo": true
+        },
+        {
+          "origen": "I",
+          "destino": "t",
+          "activo": true
+        },
+        {
+          "origen": "s",
+          "destino": "s",
+          "activo": true
+        }
+      ]
+    },
+    "status": 400,
+    "respuesta": {
+      "error": "Un pasillo debe unir vértices distintos. No se admiten lazos."
+    }
+  },
+  {
+    "nombre": "duplicado",
+    "metodo": "POST",
+    "url": "/analizar",
+    "entrada": {
+      "vertices": [
+        "s",
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "t"
+      ],
+      "entrada": "s",
+      "salida": "t",
+      "arcos": [
+        {
+          "origen": "s",
+          "destino": "A",
+          "activo": true
+        },
+        {
+          "origen": "s",
+          "destino": "B",
+          "activo": true
+        },
+        {
+          "origen": "s",
+          "destino": "C",
+          "activo": true
+        },
+        {
+          "origen": "A",
+          "destino": "D",
+          "activo": true
+        },
+        {
+          "origen": "A",
+          "destino": "E",
+          "activo": true
+        },
+        {
+          "origen": "B",
+          "destino": "E",
+          "activo": true
+        },
+        {
+          "origen": "B",
+          "destino": "F",
+          "activo": true
+        },
+        {
+          "origen": "C",
+          "destino": "G",
+          "activo": true
+        },
+        {
+          "origen": "C",
+          "destino": "H",
+          "activo": true
+        },
+        {
+          "origen": "D",
+          "destino": "t",
+          "activo": true
+        },
+        {
+          "origen": "D",
+          "destino": "F",
+          "activo": true
+        },
+        {
+          "origen": "E",
+          "destino": "D",
+          "activo": true
+        },
+        {
+          "origen": "E",
+          "destino": "H",
+          "activo": true
+        },
+        {
+          "origen": "F",
+          "destino": "I",
+          "activo": true
+        },
+        {
+          "origen": "G",
+          "destino": "E",
+          "activo": true
+        },
+        {
+          "origen": "G",
+          "destino": "H",
+          "activo": true
+        },
+        {
+          "origen": "H",
+          "destino": "I",
+          "activo": true
+        },
+        {
+          "origen": "I",
+          "destino": "t",
+          "activo": true
+        },
+        {
+          "origen": "s",
+          "destino": "A",
+          "activo": true
+        }
+      ]
+    },
+    "status": 400,
+    "respuesta": {
+      "error": "El pasillo s → A está repetido."
+    }
+  },
+  {
+    "nombre": "reciproco",
+    "metodo": "POST",
+    "url": "/analizar",
+    "entrada": {
+      "vertices": [
+        "s",
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "t"
+      ],
+      "entrada": "s",
+      "salida": "t",
+      "arcos": [
+        {
+          "origen": "s",
+          "destino": "A",
+          "activo": true
+        },
+        {
+          "origen": "s",
+          "destino": "B",
+          "activo": true
+        },
+        {
+          "origen": "s",
+          "destino": "C",
+          "activo": true
+        },
+        {
+          "origen": "A",
+          "destino": "D",
+          "activo": true
+        },
+        {
+          "origen": "A",
+          "destino": "E",
+          "activo": true
+        },
+        {
+          "origen": "B",
+          "destino": "E",
+          "activo": true
+        },
+        {
+          "origen": "B",
+          "destino": "F",
+          "activo": true
+        },
+        {
+          "origen": "C",
+          "destino": "G",
+          "activo": true
+        },
+        {
+          "origen": "C",
+          "destino": "H",
+          "activo": true
+        },
+        {
+          "origen": "D",
+          "destino": "t",
+          "activo": true
+        },
+        {
+          "origen": "D",
+          "destino": "F",
+          "activo": true
+        },
+        {
+          "origen": "E",
+          "destino": "D",
+          "activo": true
+        },
+        {
+          "origen": "E",
+          "destino": "H",
+          "activo": true
+        },
+        {
+          "origen": "F",
+          "destino": "I",
+          "activo": true
+        },
+        {
+          "origen": "G",
+          "destino": "E",
+          "activo": true
+        },
+        {
+          "origen": "G",
+          "destino": "H",
+          "activo": true
+        },
+        {
+          "origen": "H",
+          "destino": "I",
+          "activo": true
+        },
+        {
+          "origen": "I",
+          "destino": "t",
+          "activo": true
+        },
+        {
+          "origen": "A",
+          "destino": "s",
+          "activo": true
+        }
+      ]
+    },
+    "status": 400,
+    "respuesta": {
+      "error": "El pasillo A → s tiene un recíproco."
+    }
+  },
+  {
+    "nombre": "extremos-iguales",
+    "metodo": "POST",
+    "url": "/analizar",
+    "entrada": {
+      "vertices": [
+        "s",
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "t"
+      ],
+      "entrada": "s",
+      "salida": "s",
+      "arcos": [
+        {
+          "origen": "s",
+          "destino": "A",
+          "activo": true
+        },
+        {
+          "origen": "s",
+          "destino": "B",
+          "activo": true
+        },
+        {
+          "origen": "s",
+          "destino": "C",
+          "activo": true
+        },
+        {
+          "origen": "A",
+          "destino": "D",
+          "activo": true
+        },
+        {
+          "origen": "A",
+          "destino": "E",
+          "activo": true
+        },
+        {
+          "origen": "B",
+          "destino": "E",
+          "activo": true
+        },
+        {
+          "origen": "B",
+          "destino": "F",
+          "activo": true
+        },
+        {
+          "origen": "C",
+          "destino": "G",
+          "activo": true
+        },
+        {
+          "origen": "C",
+          "destino": "H",
+          "activo": true
+        },
+        {
+          "origen": "D",
+          "destino": "t",
+          "activo": true
+        },
+        {
+          "origen": "D",
+          "destino": "F",
+          "activo": true
+        },
+        {
+          "origen": "E",
+          "destino": "D",
+          "activo": true
+        },
+        {
+          "origen": "E",
+          "destino": "H",
+          "activo": true
+        },
+        {
+          "origen": "F",
+          "destino": "I",
+          "activo": true
+        },
+        {
+          "origen": "G",
+          "destino": "E",
+          "activo": true
+        },
+        {
+          "origen": "G",
+          "destino": "H",
+          "activo": true
+        },
+        {
+          "origen": "H",
+          "destino": "I",
+          "activo": true
+        },
+        {
+          "origen": "I",
+          "destino": "t",
+          "activo": true
+        }
+      ]
+    },
+    "status": 400,
+    "respuesta": {
+      "error": "La entrada y la salida deben ser distintas."
+    }
+  },
+  {
+    "nombre": "json-malformado",
+    "metodo": "POST",
+    "url": "/analizar",
+    "cuerpo": "{",
+    "status": 400,
+    "respuesta": {
+      "error": "Envía JSON válido con Content-Type application/json."
+    }
+  },
+  {
+    "nombre": "caso-inexistente",
+    "metodo": "GET",
+    "url": "/casos/no-existe",
+    "status": 404,
+    "respuesta": {
+      "error": "Ese caso no existe."
+    }
+  }
+]
