@@ -140,14 +140,32 @@ DFS / profundidad & Pila o recursión para continuar una rama antes de retrocede
 
 Con listas de adyacencia, ambas búsquedas tienen costo $O(|V|+|E|)$ para una exploración completa. Se selecciona BFS porque todos los pasillos aportan una unidad a la longitud. Por ejemplo, DFS podría visitar primero $s\to A\to E\to H\to I\to t$, de cinco arcos, si prioriza esos vecinos. BFS obtiene una ruta de tres arcos en la misma red.
 
-\tema{Organización del programa}
+\tema{Selección para las rutas independientes}
+Se busca la mayor cantidad de rutas dirigidas de $s$ a $t$ que puedan coexistir sin compartir arcos. Cada método de la tabla garantiza el máximo si se ejecuta completo.
+
+{\small
+\begin{tabularx}{\linewidth}{@{}p{.23\linewidth}XX@{}}
+\toprule
+\textbf{Estrategia} & \textbf{Cómo obtiene el máximo} & \textbf{Costo}\\\midrule
+Enumeración exhaustiva & Genera los $P$ caminos simples mediante DFS con retroceso y elige el subconjunto más grande cuyos arcos sean disjuntos. & Puede haber exponencialmente muchos caminos. Probar todos sus subconjuntos implica hasta $2^P$ candidatos.\\
+Flujo unitario con Edmonds--Karp & Asigna capacidad uno a cada pasillo activo. Usa BFS en la red residual hasta que ya no hay camino de aumento y extrae las rutas a partir del flujo final. & Para un máximo de $k$ rutas, el flujo y la extracción cuestan $O((k+1)(|V|+|E|))$ en este modelo unitario.\\\bottomrule
+\end{tabularx}}
+
+La enumeración por retroceso permite comprobar instancias pequeñas. Basta considerar caminos simples, ya que borrar un ciclo de una ruta conserva sus extremos y solo elimina arcos. Para la aplicación se elige flujo unitario, que obtiene el máximo sin generar toda la lista de caminos. Cada aumento agrega una unidad, y $k$ está acotado por la cantidad de arcos activos que salen de $s$ y por la cantidad de los que entran a $t$. Cada búsqueda y la preparación de sus vecinos cuestan $O(|V|+|E|)$.~\cite{sedgewick,edmondskarp}
+
+\textbf{Por qué hace falta la red residual.}
+En el caso manual, elegir primero $s\to a\to c\to t$ y retirar sus arcos dejaría una sola ruta en la familia. El siguiente camino de aumento, $s\to b\to c\to a\to d\to t$, usa el paso residual inverso $c\to a$ para cancelar el flujo anterior sobre $a\to c$. El flujo final permite extraer dos rutas sin arcos compartidos, $s\to a\to d\to t$ y $s\to b\to c\to t$. El corte $\{(s,a),(s,b)\}$ tiene tamaño dos y desconecta $s$ de $t$, lo que certifica que la familia es máxima.
+
+\newpage
+\pdfbookmark[1]{Organización del programa}{organizacion}
+\titulo{Organización del programa}
 {\small
 \begin{tabularx}{\linewidth}{@{}p{.28\linewidth}X@{}}
 \toprule
 \textbf{Componente} & \textbf{Responsabilidad}\\\midrule
 \texttt{casos.json} & Almacena vértices, inventario de pasillos y extremos de las redes original y manual.\\
 \texttt{modelo.py} & Carga las redes y valida nombres, extremos, lazos, duplicados y recíprocos.\\
-\texttt{algoritmos.py} & Implementa BFS, reconstruye el camino y prepara la respuesta de \texttt{resolver}.\\
+\texttt{algoritmos.py} & Implementa BFS, reconstrucción de caminos, flujo unitario, extracción de rutas y corte mínimo.\\
 \texttt{app.py} & Expone el servidor Flask y el análisis mediante \texttt{POST /analizar}.\\
 \texttt{templates/}, \texttt{static/} & Presentan los escenarios y muestran la respuesta del servidor.\\
 \texttt{tests/} & Reúne las comprobaciones automatizadas del modelo, la búsqueda y la API.\\\bottomrule
@@ -156,7 +174,7 @@ Con listas de adyacencia, ambas búsquedas tienen costo $O(|V|+|E|)$ para una ex
 Flask conecta las rutas HTTP con las funciones de análisis y sirve la página del navegador.~\cite{flask} Los pasillos bloqueados permanecen en el inventario y se omiten al construir las listas de vecinos activos. Esto permite validar duplicados y recíprocos considerando también las conexiones que podrían restablecerse. Los límites de cantidad y la ausencia de aislados se revisan al cargar la configuración inicial.
 
 \tema{Contrato de análisis}
-Cada solicitud incluye el grafo y sus extremos. BFS calcula los campos \texttt{ruta} y \texttt{distancia}. En los casos conectados, \texttt{caminos}, \texttt{maximo} y \texttt{corte} se devuelven como \texttt{null}, y \texttt{calculos\_pendientes} identifica el análisis de rutas disjuntas y corte mínimo que aún requiere implementación.
+Cada solicitud incluye el grafo y sus extremos. BFS calcula los campos \texttt{ruta} y \texttt{distancia}. El flujo unitario permite obtener \texttt{caminos}, \texttt{maximo} y \texttt{corte}. La respuesta de esta versión entrega \texttt{calculos\_pendientes} como una lista vacía.
 
 Si $t$ es inalcanzable, la ruta y distancia carecen de valor, la cantidad de caminos es cero y el corte es el conjunto vacío. Los datos inválidos producen HTTP 400 y un mensaje de error. La página permite consultar tanto la entrada JSON como la respuesta calculada.
 
@@ -185,11 +203,38 @@ Bloquear las dos entradas de $t$ & Sin camino disponible & Sin valor\\\bottomrul
 \tema{Comprobación del cálculo}
 La suite automatizada verifica las distancias, la reconstrucción de los caminos y el certificado de dos alternativas iniciales. También comprueba bloqueos y restablecimientos, ciclos, cambio de extremos, conservación de los datos de entrada y errores HTTP.
 
-El caso independiente guardado como \texttt{manual} contiene seis vértices y siete arcos. Desde $s$ se llega a $a$ o $b$ en el primer paso, y a $c$ o $d$ en el segundo. Estos últimos son los únicos predecesores de $t$. El camino de tres arcos que obtiene BFS es mínimo,
+\newpage
+\pdfbookmark[1]{Caso manual independiente}{casomanual}
+\titulo{Caso manual independiente}
+El caso \texttt{manual} de \texttt{casos.json} tiene entrada $s$, salida $t$ y los seis vértices $\{s,a,b,c,d,t\}$. Sus siete arcos dirigidos están activos.
 \[
-\ruta{s\to a\to c\to t}.
+ E_{\mathrm{manual}}=\{(s,a),(s,b),(a,c),(a,d),(b,c),(c,t),(d,t)\}.
 \]
 
+\tema{Camino de longitud mínima}
+En un paso desde $s$ solo se alcanza $a$ o $b$. En dos pasos se alcanza $c$ o $d$, los únicos vértices con un arco hacia $t$. Por lo tanto, llegar a $t$ requiere al menos tres arcos. El camino \ruta{s\to a\to c\to t} usa exactamente tres, de modo que la distancia mínima es $3$.
+
+\tema{Familia máxima y corte mínimo}
+Los caminos $P_1=s\to a\to d\to t$ y $P_2=s\to b\to c\to t$ respetan el sentido de los arcos y sus conjuntos de arcos son disjuntos. Cada uno de estos dos caminos perdería la conexión si se elimina un arco propio. Como ningún arco pertenece a ambos, cualquier corte necesita al menos dos arcos.
+
+Al retirar $C=\{(s,a),(s,b)\}$ se bloquean las dos únicas salidas de $s$, de modo que $t$ se vuelve inalcanzable. Esto demuestra que el corte mínimo tiene tamaño $2$. Además, cada camino de $s$ a $t$ debe usar un arco de $C$. Como la familia exige que los caminos no compartan arcos, a lo sumo puede haber dos. Los caminos $P_1$ y $P_2$ alcanzan esa cota.
+
+\tema{Contraste con el programa}
+Se cargó \texttt{GET /casos/manual} y se envió el grafo a \texttt{POST /analizar}. La API devolvió HTTP 200 y coincidió con el cálculo manual en los cuatro criterios.
+
+{\small
+\begin{tabularx}{\linewidth}{@{}p{.29\linewidth}XX@{}}
+\toprule
+\textbf{Criterio} & \textbf{Cálculo manual} & \textbf{Respuesta del programa}\\\midrule
+Camino mínimo & $s\to a\to c\to t$ & $s\to a\to c\to t$\\
+Distancia mínima & $3$ arcos & \texttt{distancia} = 3\\
+Familia máxima & $P_1$ y $P_2$ & $P_1$ y $P_2$ (\texttt{maximo} = 2)\\
+Corte mínimo & $\{(s,a),(s,b)\}$ & $\{(s,a),(s,b)\}$\\\bottomrule
+\end{tabularx}}
+
+Al enviar el mismo caso con ambos arcos del corte bloqueados, \texttt{ruta} y \texttt{distancia} fueron \texttt{null} y \texttt{maximo} fue $0$. Así se comprobó que el corte devuelto desconecta la salida.
+
+\begin{samepage}
 \tema{Código y referencias}
 El repositorio aloja el código fuente, las dependencias y las instrucciones de ejecución y verificación.\par
 \url{https://github.com/SebasMenas/TeoriaGrafosTrabajo}
@@ -201,6 +246,9 @@ El repositorio aloja el código fuente, las dependencias y las instrucciones de 
 \bibitem{enunciado} INFO1158 (2026). \emph{Proyecto 1. Simulador interactivo de laberintos y rutas alternativas}. Enunciado del proyecto, pp. 2--5.
 \bibitem{mitbfs} Demaine, E., Ku, J. y Solomon, J. (2020). \emph{Lecture 9. Breadth-First Search}. MIT 6.006. \href{https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/196a95604877d326c6586e60477b59d4_MIT6_006S20_lec9.pdf}{Apuntes de BFS}.
 \bibitem{mitdfs} Demaine, E., Ku, J. y Solomon, J. (2020). \emph{Lecture 10. Depth-First Search}. MIT 6.006. \href{https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/f3e349e0eb3288592289d2c81e0c4f4d_MIT6_006S20_lec10.pdf}{Apuntes de DFS}.
+\bibitem{sedgewick} Sedgewick, R. (2001). \emph{Algorithms in C, Part 5: Graph Algorithms}, 3.\,a ed. Addison-Wesley Professional. \href{https://www.pearson.com/en-us/subject-catalog/p/algorithms-in-c-part-5-graph-algorithms/P200000000599}{Ficha del libro}.
+\bibitem{edmondskarp} Edmonds, J. y Karp, R. M. (1972). \emph{Theoretical Improvements in Algorithmic Efficiency for Network Flow Problems}. Journal of the ACM, 19(2), 248--264. \href{https://doi.org/10.1145/321694.321699}{DOI del artículo}.
 \bibitem{flask} Pallets. \emph{Flask Documentation. Quickstart}. \href{https://flask.palletsprojects.com/en/stable/quickstart/}{Documentación técnica}.
 \end{thebibliography}}
+\end{samepage}
 \end{document}
