@@ -21,7 +21,8 @@ button:disabled { cursor: wait; opacity: .65; }
 #aviso.error { color: #ae403a; }
 #modelo { color: #486069; }
 .respuesta { background: white; border-left: 4px solid #096a57; padding: 22px; display: flex; flex-wrap: wrap; gap: 24px 48px; }
-#ruta, #distancia { font-size: 1.65rem; color: #096a57; font-weight: 650; margin-bottom: 0; }
+#ruta, #distancia, #maximo, #tamano-corte { font-size: 1.65rem; color: #096a57; font-weight: 650; margin-bottom: 4px; }
+.lista-detalles { font-size: 0.88rem; color: #486069; line-height: 1.5; margin-top: 4px; }
 #pendientes { line-height: 1.6; }
 details { margin-block: 16px; }
 summary { cursor: pointer; color: #205c9c; }
@@ -36,20 +37,38 @@ pre { background: white; padding: 16px; overflow-x: auto; font-size: .85rem; lin
 .muestra-entrada { background: #096a57; }
 .muestra-salida { background: #205c9c; }
 .muestra-bloqueado { width: 22px; height: 0; border-radius: 0; border-top: 3px dashed #a9b7b2; }
+.muestra-ruta { width: 22px; height: 0; border-radius: 0; border-top: 3.5px solid #096a57; }
+.muestra-familia { width: 22px; height: 0; border-radius: 0; border-top: 3px solid #0284c7; }
+.muestra-corte { width: 22px; height: 0; border-radius: 0; border-top: 3.5px dashed #c0392b; }
+
+.plano-controles { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px; }
+.plano-controles-etiqueta { font-weight: 650; font-size: 0.9rem; color: #17313a; }
+.botones-vista { display: flex; flex-wrap: wrap; gap: 6px; }
+.btn-vista { padding: 6px 12px; font-size: 0.85rem; font-weight: 600; color: #17313a; background: #eaf0ed; border: 1px solid #a7bdb5; border-radius: 4px; cursor: pointer; transition: background 0.15s ease, color 0.15s ease; }
+.btn-vista:hover { background: #d4e2dc; }
+.btn-vista.activo { color: white; background: #096a57; border-color: #064a3d; }
+
 #plano-svg { display: block; width: 100%; height: auto; background: #fbfaf6; border: 1px solid #e2ddd2; border-radius: 6px; }
-.arco { stroke: #4b5d64; stroke-width: 1.1; fill: none; }
+.arco { stroke: #4b5d64; stroke-width: 1.1; fill: none; transition: stroke 0.2s ease, stroke-width 0.2s ease; }
 .arco.bloqueado { stroke: #a9b7b2; stroke-dasharray: 6 5; }
 .punta-activa { fill: #f28c28; }
-.punta-bloqueada { fill: #f28c28; }
+.punta-bloqueada { fill: #a9b7b2; }
+.punta-ruta { fill: #096a57; }
+.punta-familia { fill: #0284c7; }
+.punta-familia-alt { fill: #205c9c; }
+.punta-corte { fill: #c0392b; }
+
 .vertice circle { fill: #17313a; stroke: #0d1f26; stroke-width: 1.5; }
 .vertice.entrada circle { fill: #096a57; stroke: #064a3d; }
 .vertice.salida circle { fill: #205c9c; stroke: #16406d; }
 .vertice text { fill: white; font-size: 14px; font-weight: 650; pointer-events: none; }
 .plano-aviso { min-height: 1.3em; margin: 10px 0 0; font-size: .9rem; color: #486069; }
 
-/* Reservadas para resaltar resultados en T11; vacías a propósito. */
-.ruta { }
-.familia { }
-.corte { }
+/* Resaltes del cálculo sobre el plano dirigido */
+.arco.ruta { stroke: #096a57; stroke-width: 3.4; }
+.arco.familia { stroke-width: 3.2; }
+.arco.familia-0 { stroke: #0284c7; }
+.arco.familia-1 { stroke: #205c9c; }
+.arco.corte { stroke: #c0392b; stroke-width: 3.4; stroke-dasharray: 5 3; }
 
 @media (max-width: 450px) { .contenedor { padding: 20px; } }
