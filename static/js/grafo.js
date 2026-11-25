@@ -200,4 +200,88 @@ function dibujarRed(grafo, opciones = {}) {
   if (aviso) aviso.textContent = describirRed(grafo, definidas);
 }
 
-window.Plano = { dibujarRed, dibujarArco, dibujarVertice };
+// Busca un elemento arco en el SVG mediante sus atributos de origen y destino.
+function obtenerElementoArco(origen, destino) {
+  return document.querySelector(`#capa-arcos line[data-origen="${origen}"][data-destino="${destino}"]`);
+}
+
+// Remueve las clases de resalte y restablece el marcador original de cada arco.
+function limpiarResaltes() {
+  const lineas = document.querySelectorAll('#capa-arcos line');
+  for (const linea of lineas) {
+    linea.classList.remove('ruta', 'familia', 'familia-0', 'familia-1', 'corte');
+    const bloqueado = linea.classList.contains('bloqueado');
+    linea.setAttribute('marker-end', `url(#flecha-${bloqueado ? 'bloqueada' : 'activa'})`);
+  }
+}
+
+// Resalta la ruta mínima (lista de vértices de s a t).
+function resaltarRuta(ruta) {
+  if (!Array.isArray(ruta) || ruta.length < 2) return;
+  for (let i = 0; i < ruta.length - 1; i++) {
+    const linea = obtenerElementoArco(ruta[i], ruta[i + 1]);
+    if (linea) {
+      linea.classList.add('ruta');
+      linea.setAttribute('marker-end', 'url(#flecha-ruta)');
+      // Reinsertar al final de la capa para que se dibuje por encima de arcos comunes
+      linea.parentElement.append(linea);
+    }
+  }
+}
+
+// Resalta la familia de caminos disjuntos (lista de listas de vértices).
+function resaltarFamilia(caminos) {
+  if (!Array.isArray(caminos) || caminos.length === 0) return;
+  caminos.forEach((camino, indice) => {
+    const claseVariante = `familia-${indice % 2}`;
+    const idFlecha = indice % 2 === 0 ? 'url(#flecha-familia)' : 'url(#flecha-familia-alt)';
+    for (let i = 0; i < camino.length - 1; i++) {
+      const linea = obtenerElementoArco(camino[i], camino[i + 1]);
+      if (linea) {
+        linea.classList.add('familia', claseVariante);
+        linea.setAttribute('marker-end', idFlecha);
+        linea.parentElement.append(linea);
+      }
+    }
+  });
+}
+
+// Resalta los arcos del corte mínimo (lista de pares [origen, destino]).
+function resaltarCorte(corte) {
+  if (!Array.isArray(corte) || corte.length === 0) return;
+  for (const par of corte) {
+    if (!Array.isArray(par) || par.length < 2) continue;
+    const [origen, destino] = par;
+    const linea = obtenerElementoArco(origen, destino);
+    if (linea) {
+      linea.classList.add('corte');
+      linea.setAttribute('marker-end', 'url(#flecha-corte)');
+      linea.parentElement.append(linea);
+    }
+  }
+}
+
+// Aplica el modo de visualización seleccionado según los datos recibidos del servidor.
+function aplicarModoVista(modo, datos) {
+  limpiarResaltes();
+  if (!datos || datos.ruta === null) return;
+
+  if (modo === 'ruta') {
+    resaltarRuta(datos.ruta);
+  } else if (modo === 'familia') {
+    resaltarFamilia(datos.caminos);
+  } else if (modo === 'corte') {
+    resaltarCorte(datos.corte);
+  }
+}
+
+window.Plano = {
+  dibujarRed,
+  dibujarArco,
+  dibujarVertice,
+  limpiarResaltes,
+  resaltarRuta,
+  resaltarFamilia,
+  resaltarCorte,
+  aplicarModoVista
+};
