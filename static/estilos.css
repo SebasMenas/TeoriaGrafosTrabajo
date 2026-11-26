@@ -41,7 +41,18 @@ button:disabled { cursor: not-allowed; opacity: .6; }
 .muestra-entrada { background: #096a57; }
 .muestra-salida { background: #205c9c; }
 .muestra-bloqueado { width: 22px; height: 0; border-radius: 0; border-top: 3px dashed #a9b7b2; }
-.ayuda-plano { margin: 12px 0 8px; color: #486069; font-size: .88rem; }
+.muestra-ruta { width: 18px; height: 3px; border-radius: 0; background: #096a57; }
+.muestra-familia { width: 18px; height: 3px; border-radius: 0; background: #205c9c; }
+.muestra-corte { width: 18px; height: 0; border-radius: 0; border-top: 3px dashed #ae403a; }
+.ayuda-plano { margin: 12px 0 6px; color: #486069; font-size: .88rem; }
+.modos-vista { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0 12px; }
+.etiqueta-vista { font-size: .82rem; font-weight: 700; color: #486069; }
+.btn-vista { min-height: 32px; padding: 4px 11px; font-size: .8rem; font-weight: 650; color: #17313a; background: #f7f3e9; border: 1px solid #b58a42; border-radius: 4px; cursor: pointer; transition: background .15s ease, color .15s ease; }
+.btn-vista:hover:not(:disabled) { background: #eee3ce; }
+.btn-vista.activo { color: white; background: #17313a; border-color: #17313a; }
+.btn-vista[data-modo="ruta"].activo { background: #096a57; border-color: #096a57; }
+.btn-vista[data-modo="familia"].activo { background: #205c9c; border-color: #205c9c; }
+.btn-vista[data-modo="corte"].activo { background: #ae403a; border-color: #ae403a; }
 #plano-svg { display: block; width: 100%; height: auto; background: #fbfaf6; border: 1px solid #e2ddd2; border-radius: 6px; }
 .arco { stroke: #4b5d64; stroke-width: 1.1; fill: none; cursor: pointer; transition: stroke .2s ease, stroke-width .2s ease; }
 .arco:hover { stroke: #205c9c; stroke-width: 2.4; }
@@ -49,6 +60,10 @@ button:disabled { cursor: not-allowed; opacity: .6; }
 .etiqueta-bloqueado { fill: #486069; stroke: #fbfaf6; stroke-width: 3px; paint-order: stroke; font-size: 9px; font-weight: 650; }
 .punta-activa { fill: #205c9c; }
 .punta-bloqueada { fill: #a9b7b2; }
+.punta-ruta { fill: #096a57; }
+.punta-familia { fill: #205c9c; }
+.punta-familia-alt { fill: #b58a42; }
+.punta-corte { fill: #ae403a; }
 .vertice circle { fill: #17313a; stroke: #0d1f26; stroke-width: 1.5; }
 .vertice.entrada circle { fill: #096a57; stroke: #064a3d; }
 .vertice.salida circle { fill: #205c9c; stroke: #16406d; }

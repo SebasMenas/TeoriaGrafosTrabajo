@@ -22,6 +22,8 @@ const elementos = {
 let estado = null;
 let cargando = false;
 let calculando = false;
+let ultimoResultado = null;
+let modoVista = 'normal';
 
 // Conserva solo el contrato de la red y explicita el estado de cada pasillo.
 function normalizarGrafo(grafo) {
@@ -167,6 +169,8 @@ function renderizarEditor(reiniciar = false) {
 }
 
 function marcarDesactualizado(mensaje) {
+  ultimoResultado = null;
+  fijarModoVista('normal');
   limpiarResultados('Desactualizado: pulsa Recalcular para analizar los cambios.');
   elementos.resultado.classList.add('desactualizado');
   elementos.aviso.classList.remove('error');
@@ -306,8 +310,30 @@ function mostrarResultado(datos, estadoEnviado) {
     : 'Todos los cálculos están disponibles en la respuesta del servidor.';
   document.getElementById('entrada-json').textContent = JSON.stringify(estadoEnviado, null, 2);
   document.getElementById('salida-json').textContent = JSON.stringify(datos, null, 2);
+  ultimoResultado = datos;
+  if (datos.ruta && datos.ruta.length > 0) {
+    fijarModoVista('ruta');
+  } else {
+    fijarModoVista('normal');
+  }
   elementos.aviso.classList.remove('error');
   elementos.aviso.textContent = 'Cálculo completado.';
+}
+
+function fijarModoVista(nuevoModo) {
+  modoVista = nuevoModo;
+  document.querySelectorAll('.btn-vista').forEach(btn => {
+    const activo = btn.dataset.modo === nuevoModo;
+    btn.classList.toggle('activo', activo);
+    btn.setAttribute('aria-pressed', String(activo));
+  });
+  aplicarModoVistaActual();
+}
+
+function aplicarModoVistaActual() {
+  if (window.Plano && typeof window.Plano.aplicarModoVista === 'function') {
+    window.Plano.aplicarModoVista(modoVista, ultimoResultado);
+  }
 }
 
 // Envía siempre el inventario completo, incluidos los pasillos bloqueados.
@@ -340,6 +366,8 @@ async function recalcular() {
 async function restaurarRed() {
   cargando = true;
   estado = null;
+  ultimoResultado = null;
+  fijarModoVista('normal');
   renderizarEditor(true);
   actualizarControles();
   limpiarErroresControl();
@@ -379,6 +407,12 @@ elementos.recalcular.addEventListener('click', recalcular);
 elementos.formularioCaso.addEventListener('submit', evento => {
   evento.preventDefault();
   restaurarRed();
+});
+
+document.querySelectorAll('.btn-vista').forEach(btn => {
+  btn.addEventListener('click', () => {
+    fijarModoVista(btn.dataset.modo);
+  });
 });
 
 restaurarRed();

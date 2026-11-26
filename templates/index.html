@@ -50,9 +50,19 @@
             <li><span class="muestra muestra-entrada" aria-hidden="true"></span>Entrada</li>
             <li><span class="muestra muestra-salida" aria-hidden="true"></span>Salida</li>
             <li><span class="muestra muestra-bloqueado" aria-hidden="true"></span>Bloqueado</li>
+            <li><span class="muestra muestra-ruta" aria-hidden="true"></span>Ruta mínima</li>
+            <li><span class="muestra muestra-familia" aria-hidden="true"></span>Rutas disjuntas</li>
+            <li><span class="muestra muestra-corte" aria-hidden="true"></span>Corte mínimo</li>
           </ul>
         </div>
         <p class="ayuda-plano">Haz clic en un pasillo para bloquearlo o restablecerlo.</p>
+        <div class="modos-vista" role="group" aria-label="Modo de visualización en el plano">
+          <span class="etiqueta-vista">Resaltar en el plano:</span>
+          <button type="button" class="btn-vista activo" data-modo="normal" aria-pressed="true">Normal</button>
+          <button type="button" class="btn-vista" data-modo="ruta" aria-pressed="false">Camino mínimo</button>
+          <button type="button" class="btn-vista" data-modo="familia" aria-pressed="false">Rutas disjuntas</button>
+          <button type="button" class="btn-vista" data-modo="corte" aria-pressed="false">Corte mínimo</button>
+        </div>
         <svg id="plano-svg" viewBox="0 0 620 220" role="img" aria-labelledby="plano-svg-titulo">
           <title id="plano-svg-titulo">Plano dirigido de la red</title>
           <defs>
@@ -63,6 +73,22 @@
             <marker id="flecha-bloqueada" viewBox="0 0 10 8" refX="10" refY="4"
                     markerWidth="10" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
               <path class="punta-bloqueada" d="M0,0 L10,4 L0,8 Z"></path>
+            </marker>
+            <marker id="flecha-ruta" viewBox="0 0 10 8" refX="10" refY="4"
+                    markerWidth="10" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+              <path class="punta-ruta" d="M0,0 L10,4 L0,8 Z"></path>
+            </marker>
+            <marker id="flecha-familia" viewBox="0 0 10 8" refX="10" refY="4"
+                    markerWidth="10" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+              <path class="punta-familia" d="M0,0 L10,4 L0,8 Z"></path>
+            </marker>
+            <marker id="flecha-familia-alt" viewBox="0 0 10 8" refX="10" refY="4"
+                    markerWidth="10" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+              <path class="punta-familia-alt" d="M0,0 L10,4 L0,8 Z"></path>
+            </marker>
+            <marker id="flecha-corte" viewBox="0 0 10 8" refX="10" refY="4"
+                    markerWidth="10" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+              <path class="punta-corte" d="M0,0 L10,4 L0,8 Z"></path>
             </marker>
           </defs>
           <g id="capa-arcos"></g>
