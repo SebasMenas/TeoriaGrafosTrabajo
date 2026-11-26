@@ -7,4 +7,6 @@ informe/*.log
 informe/*.out
 informe/*.toc
 informe/*.synctex.gz
-informe/*.pdf
+# Conservar PDFs compilados para entrega
+!informe/*.pdf
+
