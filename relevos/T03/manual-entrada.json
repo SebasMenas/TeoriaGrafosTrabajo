@@ -1,0 +1,49 @@
+{
+  "vertices": [
+    "s",
+    "a",
+    "b",
+    "c",
+    "d",
+    "t"
+  ],
+  "entrada": "s",
+  "salida": "t",
+  "arcos": [
+    {
+      "origen": "s",
+      "destino": "a",
+      "activo": true
+    },
+    {
+      "origen": "s",
+      "destino": "b",
+      "activo": true
+    },
+    {
+      "origen": "a",
+      "destino": "c",
+      "activo": true
+    },
+    {
+      "origen": "a",
+      "destino": "d",
+      "activo": true
+    },
+    {
+      "origen": "b",
+      "destino": "c",
+      "activo": true
+    },
+    {
+      "origen": "c",
+      "destino": "t",
+      "activo": true
+    },
+    {
+      "origen": "d",
+      "destino": "t",
+      "activo": true
+    }
+  ]
+}

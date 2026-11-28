@@ -1,0 +1,167 @@
+{
+  "original": {
+    "id": "original",
+    "nombre": "Red original (11 vértices, 18 arcos)",
+    "distancia_minima": 3,
+    "ruta_minima": [
+      "s",
+      "A",
+      "D",
+      "t"
+    ],
+    "maximo_caminos_disjuntos": 2,
+    "caminos_independientes": [
+      [
+        "s",
+        "A",
+        "D",
+        "t"
+      ],
+      [
+        "s",
+        "B",
+        "F",
+        "I",
+        "t"
+      ]
+    ],
+    "corte_minimo": [
+      [
+        "D",
+        "t"
+      ],
+      [
+        "I",
+        "t"
+      ]
+    ],
+    "caminos_simples_totales": 14,
+    "arcos_activos": 18
+  },
+  "bloqueo": {
+    "id": "bloqueo",
+    "nombre": "Bloqueo pasillo D -> t",
+    "distancia_minima": 4,
+    "ruta_minima": [
+      "s",
+      "B",
+      "F",
+      "I",
+      "t"
+    ],
+    "maximo_caminos_disjuntos": 1,
+    "caminos_independientes": [
+      [
+        "s",
+        "B",
+        "F",
+        "I",
+        "t"
+      ]
+    ],
+    "corte_minimo": [
+      [
+        "I",
+        "t"
+      ]
+    ],
+    "caminos_simples_totales": 10,
+    "arcos_activos": 17
+  },
+  "atajo": {
+    "id": "atajo",
+    "nombre": "Atajo pasillo C -> t",
+    "distancia_minima": 2,
+    "ruta_minima": [
+      "s",
+      "C",
+      "t"
+    ],
+    "maximo_caminos_disjuntos": 3,
+    "caminos_independientes": [
+      [
+        "s",
+        "C",
+        "t"
+      ],
+      [
+        "s",
+        "A",
+        "D",
+        "t"
+      ],
+      [
+        "s",
+        "B",
+        "F",
+        "I",
+        "t"
+      ]
+    ],
+    "corte_minimo": [
+      [
+        "s",
+        "A"
+      ],
+      [
+        "s",
+        "B"
+      ],
+      [
+        "s",
+        "C"
+      ]
+    ],
+    "caminos_simples_totales": 15,
+    "arcos_activos": 19
+  },
+  "manual": {
+    "id": "manual",
+    "nombre": "Caso manual independiente (6 vértices, 7 arcos)",
+    "distancia_minima": 3,
+    "ruta_minima": [
+      "s",
+      "a",
+      "c",
+      "t"
+    ],
+    "maximo_caminos_disjuntos": 2,
+    "caminos_independientes": [
+      [
+        "s",
+        "a",
+        "d",
+        "t"
+      ],
+      [
+        "s",
+        "b",
+        "c",
+        "t"
+      ]
+    ],
+    "corte_minimo": [
+      [
+        "s",
+        "a"
+      ],
+      [
+        "s",
+        "b"
+      ]
+    ],
+    "caminos_simples_totales": 3,
+    "arcos_activos": 7
+  },
+  "sin_conexion": {
+    "id": "sin_conexion",
+    "nombre": "Red desconectada (bloqueo D->t e I->t)",
+    "distancia_minima": null,
+    "ruta_minima": null,
+    "maximo_caminos_disjuntos": 0,
+    "caminos_independientes": [],
+    "corte_minimo": [],
+    "caminos_simples_totales": 0,
+    "arcos_activos": 16
+  }
+}

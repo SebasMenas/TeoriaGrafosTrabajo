@@ -1,0 +1,109 @@
+{
+  "vertices": [
+    "s",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "t"
+  ],
+  "entrada": "s",
+  "salida": "t",
+  "arcos": [
+    {
+      "origen": "s",
+      "destino": "A",
+      "activo": true
+    },
+    {
+      "origen": "s",
+      "destino": "B",
+      "activo": true
+    },
+    {
+      "origen": "s",
+      "destino": "C",
+      "activo": true
+    },
+    {
+      "origen": "A",
+      "destino": "D",
+      "activo": true
+    },
+    {
+      "origen": "A",
+      "destino": "E",
+      "activo": true
+    },
+    {
+      "origen": "B",
+      "destino": "E",
+      "activo": true
+    },
+    {
+      "origen": "B",
+      "destino": "F",
+      "activo": true
+    },
+    {
+      "origen": "C",
+      "destino": "G",
+      "activo": true
+    },
+    {
+      "origen": "C",
+      "destino": "H",
+      "activo": true
+    },
+    {
+      "origen": "D",
+      "destino": "t",
+      "activo": false
+    },
+    {
+      "origen": "D",
+      "destino": "F",
+      "activo": true
+    },
+    {
+      "origen": "E",
+      "destino": "D",
+      "activo": true
+    },
+    {
+      "origen": "E",
+      "destino": "H",
+      "activo": true
+    },
+    {
+      "origen": "F",
+      "destino": "I",
+      "activo": true
+    },
+    {
+      "origen": "G",
+      "destino": "E",
+      "activo": true
+    },
+    {
+      "origen": "G",
+      "destino": "H",
+      "activo": true
+    },
+    {
+      "origen": "H",
+      "destino": "I",
+      "activo": true
+    },
+    {
+      "origen": "I",
+      "destino": "t",
+      "activo": false
+    }
+  ]
+}

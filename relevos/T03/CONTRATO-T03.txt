@@ -1,0 +1,58 @@
+CONTRATO DE ANALISIS — T03 — 25/11/2026
+Base revisada: avance/ariel-flujo, d1e0904aa568ad21c774a4a66359dcc9c6f431f1.
+Compatibilidad inspeccionada en el diff de Cristian: 37701c3, cuyo padre es 9d38852.
+Este paquete reemplaza los ejemplos del 23/11 como referencia de revisión.
+No modifica la aplicación ni certifica por sí solo T03/T11.
+
+1. Solicitud
+GET /casos/original y GET /casos/manual: grafos guardados, HTTP 200.
+POST /analizar con Content-Type: application/json y el estado completo del grafo.
+vertices: lista de nombres de texto únicos; al menos dos.
+entrada, salida: nombres presentes en vertices y distintos entre sí.
+arcos: lista de objetos {origen, destino, activo}.
+activo es booleano opcional; omitido equivale a true. Recomendación para la interfaz: enviarlo siempre.
+Los arcos bloqueados permanecen en el inventario con activo=false.
+No se permiten lazos, duplicados ni recíprocos, incluso respecto de bloqueados.
+El endpoint no persiste ediciones: la interfaz mantiene su estado y lo reenvía.
+Los límites 10–12 vertices y 14–20 arcos se aplican a la configuración inicial, no a cada edición ni al caso manual.
+
+2. Respuesta HTTP 200
+ruta: lista de vértices de un camino mínimo o null si no existe conexión.
+distancia: número entero de arcos del camino mínimo o null sin conexión.
+caminos: lista de caminos; cada camino es una lista de vértices.
+maximo: entero no negativo, igual a caminos.length.
+corte: lista de pares [origen,destino]. NO es una lista de objetos arco ni una ruta.
+calculos_pendientes: [] en el motor de Ariel revisado.
+Sin conexión: ruta=null, distancia=null, caminos=[], maximo=0, corte=[]. HTTP 200.
+Puede haber varios caminos mínimos, familias y cortes óptimos. No fijar la interfaz a un orden particular ni a nombres de vértices.
+
+3. Errores
+Entrada inválida o JSON malformado: HTTP 400 y {error: texto}.
+Caso inexistente en GET /casos/<nombre>: HTTP 404 y {error: texto}.
+Mostrar error y retirar resultados anteriores para no confundir estados.
+errores.json contiene seis respuestas reales de Flask test_client.
+
+4. Integración con el trabajo de Cristian
+El plano toma vertices, arcos, entrada y salida del grafo de entrada.
+Plano.dibujarRed(grafo,{caso}) dibuja antes del POST /analizar.
+Su commit añade coordenadas en static/js/posiciones.js; son datos visuales, no un cambio de contrato.
+Para ruta/familia, convertir cada secuencia en pares consecutivos y localizar el arco por data-origen y data-destino.
+Para corte, usar directamente cada par [origen,destino].
+Las clases ruta/familia/corte están preparadas pero vacías en ese commit: todavía falta implementar los resaltes de T11.
+La red residual es interna al motor; no forma parte de esta respuesta ni del plano.
+
+5. Verificación y relevo
+Gustavo y Sebastián acuerdan este contrato. Cristian comprueba que puede consumirlo.
+Con Flask ejecutándose, correr: python verificar_api.py
+Opcional: python verificar_api.py http://127.0.0.1:5001
+El script solo envía solicitudes de lectura/análisis sin persistencia.
+Ejecuta cinco casos y seis errores. Verifica caminos, disjunción, corte y resultados esperados.
+Guardar salida, URL local, commit y nombre del revisor como evidencia.
+T03 puede cerrarse tras revisión del consumo; T11 requiere también controles y resaltes funcionando.
+
+6. Organización del paquete
+*-entrada.json: solicitudes reproducibles. *-respuesta.json: respuestas observadas.
+errores.json: solicitudes inválidas, códigos y respuestas observadas.
+traza-manual.txt: explicación de la cancelación; material de estudio, no entrada de la API.
+verificar_api.py: comprobación HTTP ejecutable sin dependencias externas.
+Resultados del motor probados mediante test_client; el diseño visual de Cristian no fue probado en navegador en esta revisión.
