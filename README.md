@@ -1,170 +1,347 @@
 # Laberintos y rutas alternativas
 
-**Proyecto 1 de Teoría de Grafos · INFO1158**  
-*Universidad Católica de Temuco · Escuela de Informática*  
-**Equipo de desarrollo:** Cristian Cáceres, Ariel Díaz, Gustavo Martínez y Sebastián Mena.  
-**Docente:** Elliott Mardones Arias.  
+**Proyecto 1 de Teoría de Grafos · INFO1158**<br>
+Universidad Católica de Temuco · Escuela de Informática<br>
+**Equipo:** Cristian Cáceres, Ariel Díaz, Gustavo Martínez y Sebastián Mena.<br>
+**Docente:** Elliott Mardones Arias.<br>
 **Fecha de entrega:** 26 de noviembre de 2026.
 
-Simulador interactivo de una red de pasillos de sentido único para robots de inspección en un centro de almacenamiento logístico. Permite estudiar en tiempo real el camino de menor longitud, la cantidad máxima de rutas independientes que no comparten pasillos y los cortes críticos que interrumpen la conectividad ante contingencias.
+Simulador interactivo de una red de pasillos de sentido único para robots de inspección en un centro de almacenamiento logístico. La aplicación permite modificar la red y analizar en tiempo real:
 
-El proyecto combina **modelación matemática rigurosa**, **algoritmos de optimización de redes con código propio** (BFS y Edmonds–Karp unitario), una **interfaz web interactiva con Python, Flask y SVG**, y un **informe técnico completo en LaTeX**.
+- el camino de menor longitud entre la entrada y la salida;
+- la cantidad máxima de rutas independientes que no comparten pasillos;
+- el corte mínimo de pasillos cuya eliminación desconecta la salida.
 
----
+El backend utiliza Python y Flask; el frontend utiliza JavaScript nativo y SVG. BFS y Edmonds–Karp están implementados en el repositorio, sin NetworkX ni otras librerías de grafos.
 
-## 1. El problema y objetivos del análisis
+## Contenido
 
-El sistema responde a tres interrogantes fundamentales:
+- [Requisitos](#requisitos)
+- [Puesta en marcha](#puesta-en-marcha)
+- [Uso de la interfaz](#uso-de-la-interfaz)
+- [Modelo y restricciones](#modelo-y-restricciones)
+- [Algoritmos](#algoritmos)
+- [API HTTP](#api-http)
+- [Pruebas y verificación](#pruebas-y-verificación)
+- [Casos de estudio](#casos-de-estudio)
+- [Estructura del repositorio](#estructura-del-repositorio)
+- [Informe técnico](#informe-técnico)
+- [Solución de problemas](#solución-de-problemas)
 
-| Objetivo | Definición matemática | Procedimiento algorítmico implementado |
-|---|---|---|
-| **Camino mínimo** | $d_G(s, t) = \min \{ \|E(P)\| \}$ | Búsqueda en anchura (**BFS**) con reconstrucción por predecesores. |
-| **Rutas independientes** | $\max \{ \|\mathcal{P}\| : E(P_i) \cap E(P_j) = \varnothing \}$ | Formulación de **Flujo Máximo con capacidades unitarias** (Edmonds–Karp). |
-| **Corte mínimo** | $\min \{ \|C\| : G - C \text{ desconecta } s \text{ de } t \}$ | Identificación constructiva de arcos salientes desde el conjunto alcanzable residual $S$. |
+## Requisitos
 
----
+- Python 3.10 o posterior.
+- Flask 3.1.3, declarado en [`requirements.txt`](requirements.txt).
+- Navegador web moderno.
+- Opcional: una distribución LaTeX con `pdflatex` para recompilar el informe.
 
-## 2. Estado del proyecto (100% Completado)
+`requirements.txt` declara Flask como única dependencia directa. Werkzeug se instala automáticamente como dependencia transitiva de Flask.
 
-| Componente | Estado | Descripción técnica |
-|---|---|---|
-| **Modelo y validaciones** | **Completado** | Validación de extremos, rechazo de lazos, arcos múltiples y recíprocos en `modelo.py`. |
-| **Camino mínimo (BFS)** | **Completado** | Exploración por capas y reconstrucción de camino en $O(\|V\| + \|E\|)$ en `algoritmos.py`. |
-| **Flujo unitario y rutas** | **Completado** | Edmonds–Karp con red residual directa e inversa y descomposición de caminos en `algoritmos.py`. |
-| **Corte mínimo constructivo** | **Completado** | Obtención del corte saliente desde la residual final ($|f_{\max}| = \|C\|$). |
-| **Plano interactivo SVG** | **Completado** | Visualización gráfica del laberinto, bloqueo/restablecimiento con interruptores y alta de arcos. |
-| **Resaltado de soluciones** | **Completado** | Selector dinámico para destacar: *Camino mínimo* (verde), *Rutas disjuntas* (azul/oro) y *Corte mínimo* (rojo discontinuo). |
-| **Suite de pruebas** | **Completado** | 16 pruebas automatizadas con `unittest` en `tests/`. |
-| **Verificación matemática** | **Completado** | Script `verificar_informe.py` que comprueba los 5 casos y realiza enumeración exhaustiva por retroceso. |
-| **Informe técnico LaTeX** | **Completado** | Documento formal de 14 páginas compilado en `informe/informe.pdf` con portada institucional, índice, teoría profunda y conclusiones exclusivas. |
-
----
-
-## 3. Puesta en marcha
-
-**Requisitos:** Python 3.10 o posterior.
-
-### Linux / macOS
-
-```bash
-# 1. Crear y activar entorno virtual
-python3 -m venv .venv
-source .venv/bin/activate
-
-# 2. Instalar dependencias
-pip install -r requirements.txt
-
-# 3. Iniciar el servidor web
-flask --app app run
-```
+## Puesta en marcha
 
 ### Windows · PowerShell
 
 ```powershell
-# 1. Crear y activar entorno virtual
+# 1. Crear el entorno virtual
 py -3 -m venv .venv
+
+# 2. Activarlo
 .\.venv\Scripts\Activate.ps1
 
-# 2. Instalar dependencias
-pip install -r requirements.txt
+# 3. Instalar dependencias
+python -m pip install -r requirements.txt
 
-# 3. Iniciar el servidor web
-flask --app app run
+# 4. Iniciar el servidor
+python -m flask --app app run
 ```
 
-Abrir **[http://127.0.0.1:5000](http://127.0.0.1:5000)** en el navegador.
+Si PowerShell bloquea la activación del entorno virtual, ejecuta estos comandos en la misma terminal y vuelve al paso 2:
 
----
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+```
 
-## 4. Uso de la interfaz interactiva
+### Linux / macOS
 
-1. **Seleccionar red base:** En el panel superior, elige entre la `Red original (11 espacios)` o el `Caso manual (6 espacios)`.
-2. **Edición dinámica:**
-   - **Bloquear/Restablecer:** Haz clic directamente sobre cualquier arco en el plano o utiliza los interruptores accesibles.
-   - **Agregar pasillo:** Selecciona origen y destino para crear un nuevo pasillo dirigido (valida lazos y duplicados).
-   - **Cambiar extremos:** Modifica libremente el vértice de entrada ($s$) y de salida ($t$).
-3. **Analizar resultados:** Pulsa el botón **Recalcular** para consultar al servidor.
-4. **Visualizar soluciones en el plano:** Usa la barra de modos de vista para alternar entre:
-   - **Normal:** Plano limpio con arcos activos y bloqueados.
-   - **Camino mínimo:** Resalta la ruta más corta en verde.
-   - **Rutas disjuntas:** Resalta la familia máxima de caminos independientes diferenciados en azul y oro.
-   - **Corte mínimo:** Destaca en rojo punteado los pasillos críticos cuya eliminación aísla la salida.
+```bash
+# 1. Crear el entorno virtual
+python3 -m venv .venv
 
----
+# 2. Activarlo
+source .venv/bin/activate
 
-## 5. Verificación reproducible y pruebas automatizadas
+# 3. Instalar dependencias
+python -m pip install -r requirements.txt
 
-El proyecto cuenta con dos mecanismos complementarios de verificación:
+# 4. Iniciar el servidor
+python -m flask --app app run
+```
 
-### A. Suite de pruebas unitarias (`unittest`)
-Ejecuta las 16 pruebas automatizadas que validan la API Flask, el modelo y los algoritmos:
+Abre <http://127.0.0.1:5000> en el navegador. Para detener el servidor, pulsa `Ctrl+C` en la terminal.
+
+Si el puerto 5000 está ocupado, inicia Flask en otro puerto:
+
+```powershell
+python -m flask --app app run --port 5001
+```
+
+```bash
+python -m flask --app app run --port 5001
+```
+
+En ese caso, abre <http://127.0.0.1:5001>.
+
+## Uso de la interfaz
+
+1. **Selecciona la red base:** `Red original (11 espacios)` o `Caso manual (6 espacios)`.
+2. **Modifica los pasillos:**
+   - Haz clic sobre un arco del plano o usa su interruptor para bloquearlo o restablecerlo.
+   - Usa el formulario para agregar un pasillo dirigido.
+   - Cambia los vértices de entrada y salida desde los selectores.
+3. **Pulsa Recalcular:** la interfaz envía el estado completo de la red a `POST /analizar`.
+4. **Selecciona un modo de visualización:**
+   - **Normal:** muestra la red sin resaltar una solución.
+   - **Camino mínimo:** resalta en verde la ruta más corta.
+   - **Rutas disjuntas:** diferencia en azul y oro los caminos de la familia máxima.
+   - **Corte mínimo:** marca en rojo discontinuo los pasillos críticos.
+
+El estado siempre se comunica con texto además del color. Las modificaciones se conservan únicamente en la sesión del navegador: **no se guardan en disco ni en una base de datos**. Recargar la página o reiniciar el servidor restaura el caso base.
+
+## Modelo y restricciones
+
+El grafo dirigido se representa con un objeto JSON:
+
+```json
+{
+  "vertices": ["s", "a", "b", "t"],
+  "entrada": "s",
+  "salida": "t",
+  "arcos": [
+    {"origen": "s", "destino": "a", "activo": true},
+    {"origen": "s", "destino": "b", "activo": true},
+    {"origen": "a", "destino": "t", "activo": true},
+    {"origen": "b", "destino": "t", "activo": true}
+  ]
+}
+```
+
+Reglas de validación:
+
+- `vertices` debe contener al menos dos nombres únicos y no vacíos.
+- `entrada` y `salida` deben existir en `vertices` y ser distintos.
+- Cada arco debe unir vértices existentes y distintos.
+- No se admiten lazos, arcos repetidos ni pares recíprocos.
+- `activo` debe ser booleano; si se omite, se interpreta como `true`.
+- Los arcos bloqueados siguen formando parte del inventario y también se validan.
+- Las ediciones pueden crear ciclos o dejar vértices aislados.
+- La red original cargada desde `casos.json` debe tener 10–12 vértices, 14–20 arcos activos y ningún vértice aislado.
+
+## Algoritmos
+
+| Cálculo | Implementación | Resultado |
+|---|---|---|
+| Camino mínimo | BFS con cola FIFO, distancias y reconstrucción por predecesores | Ruta con menor cantidad de arcos |
+| Rutas independientes | Flujo máximo con capacidades unitarias mediante Edmonds–Karp | Familia máxima de caminos sin arcos compartidos |
+| Corte mínimo | BFS final sobre la red residual y arcos salientes del conjunto alcanzable | Conjunto mínimo de arcos que desconecta `s` de `t` |
+
+Las rutas pueden compartir vértices, pero no arcos. Por el teorema de flujo máximo–corte mínimo, el tamaño de la familia máxima coincide con la cardinalidad del corte mínimo.
+
+La función `resolver(grafo)` recibe el objeto completo y lee `entrada` y `salida` desde ese objeto. No recibe ambos vértices como parámetros separados ni modifica los datos de entrada.
+
+## API HTTP
+
+Con el servidor ejecutándose en `http://127.0.0.1:5000`:
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/` | Sirve la interfaz HTML. |
+| `GET` | `/casos/<nombre>` | Devuelve una copia del caso `original` o `manual`. |
+| `POST` | `/analizar` | Valida el grafo recibido y devuelve los tres cálculos. |
+
+### Obtener un caso
+
+```bash
+curl -sS http://127.0.0.1:5000/casos/original
+```
+
+```powershell
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/casos/original" -Method Get |
+  ConvertTo-Json -Depth 10
+```
+
+Un caso inexistente devuelve HTTP 404:
+
+```json
+{"error":"Ese caso no existe."}
+```
+
+### Analizar un grafo
+
+El siguiente comando obtiene la red original y la envía directamente a `/analizar`:
+
+```bash
+curl -sS http://127.0.0.1:5000/casos/original | curl -sS -X POST -H "Content-Type: application/json" --data-binary @- http://127.0.0.1:5000/analizar
+```
+
+En PowerShell:
+
+```powershell
+$grafo = Invoke-RestMethod -Uri "http://127.0.0.1:5000/casos/original" -Method Get
+$respuesta = Invoke-RestMethod `
+  -Uri "http://127.0.0.1:5000/analizar" `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body ($grafo | ConvertTo-Json -Depth 10)
+$respuesta | ConvertTo-Json -Depth 10
+```
+
+Respuesta de la red original:
+
+```json
+{
+  "ruta": ["s", "A", "D", "t"],
+  "distancia": 3,
+  "caminos": [
+    ["s", "A", "D", "t"],
+    ["s", "B", "F", "I", "t"]
+  ],
+  "maximo": 2,
+  "corte": [["D", "t"], ["I", "t"]],
+  "calculos_pendientes": []
+}
+```
+
+| Campo | Tipo | Significado |
+|---|---|---|
+| `ruta` | `string[]` o `null` | Camino mínimo desde `entrada` hasta `salida`. |
+| `distancia` | `number` o `null` | Cantidad de arcos de `ruta`; `null` si no hay conexión. |
+| `caminos` | `string[][]` | Familia máxima de caminos disjuntos en arcos. |
+| `maximo` | `number` | Cantidad de caminos de `caminos`; equivale al flujo máximo unitario. |
+| `corte` | `string[][]` | Pares `[origen, destino]` del corte mínimo. |
+| `calculos_pendientes` | `any[]` | Reservado para cálculos diferidos; actualmente siempre `[]`. |
+
+Si no existe conexión, la respuesta usa `ruta: null`, `distancia: null`, `caminos: []`, `maximo: 0`, `corte: []` y `calculos_pendientes: []`.
+
+Los errores de JSON, tipo de contenido o validación devuelven HTTP 400 con una clave `error`:
+
+```json
+{"error":"La entrada y la salida deben ser distintas."}
+```
+
+## Pruebas y verificación
+
+### Suite unitaria
+
+Ejecuta las 16 pruebas del modelo, los algoritmos y la API Flask:
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
 ```bash
 python3 -m unittest discover -s tests -v
 ```
 
-### B. Script de verificación matemática y enumeración exhaustiva
-Evalúa los 5 escenarios mediante `app.test_client()` y contrasta la solución con una **enumeración exhaustiva por retroceso (DFS)**, demostrando que contar caminos simples no equivale a redundancia real:
+### Verificación matemática
+
+El script evalúa cinco escenarios mediante `app.test_client()`, comprueba los certificados de flujo y corte y enumera exhaustivamente los caminos simples con DFS y retroceso:
+
+```powershell
+python verificar_informe.py
+```
+
 ```bash
 python3 verificar_informe.py
 ```
 
-**Resultados certificados por el script:**
-```text
-==============================================================================
- VERIFICACIÓN MATEMÁTICA Y REPRODUCIBILIDAD (INFO1158 - PROYECTO 1)
-==============================================================================
-Entorno: app.test_client() (ejecución sin servidor externo)
+El script sobrescribe [`verificacion-resultados.json`](verificacion-resultados.json) con las trazas obtenidas en esa ejecución.
 
-Caso            Activos    Caminos    Distancia  Disjuntos    Corte Mín 
-------------------------------------------------------------------------------
-original        18         14         3          2            2         
-bloqueo         17         10         4          1            1         
-atajo           19         15         2          3            3         
-manual          7          3          3          2            2         
-sin_conexion    16         0          Sin ruta   0            0         
-------------------------------------------------------------------------------
-Todos los certificados matemáticos y enumeraciones fueron validados.
-Resultados guardados exitosamente en: verificacion-resultados.json
-==============================================================================
+### Comprobación HTTP de T03
+
+Con Flask ejecutándose en otra terminal:
+
+```powershell
+python relevos/T03/verificar_api.py
 ```
 
----
+```bash
+python3 relevos/T03/verificar_api.py
+```
 
-## 6. Organización del repositorio
+Para usar otro puerto, pasa la URL como argumento:
+
+```powershell
+python relevos/T03/verificar_api.py http://127.0.0.1:5001
+```
+
+```bash
+python3 relevos/T03/verificar_api.py http://127.0.0.1:5001
+```
+
+## Casos de estudio
+
+Los valores siguientes se obtienen de [`verificar_informe.py`](verificar_informe.py) y se contrastan con las respuestas conservadas en [`relevos/T03`](relevos/T03).
+
+| Escenario | Arcos activos | Conexión | Distancia mínima | Caminos simples | Máx. rutas disjuntas | Corte mínimo |
+|---|---:|---|---:|---:|---:|---|
+| Original | 18 | Sí | 3 | 14 | 2 | `{(D,t), (I,t)}` |
+| Bloqueo `D → t` | 17 | Sí | 4 | 10 | 1 | `{(I,t)}` |
+| Atajo `C → t` | 19 | Sí | 2 | 15 | 3 | `{(s,A), (s,B), (s,C)}` |
+| Caso manual | 7 | Sí | 3 | 3 | 2 | `{(s,a), (s,b)}` |
+| Sin conexión | 16 | No | sin valor | 0 | 0 | `∅` |
+
+La diferencia entre “caminos simples” y “rutas disjuntas” es central: contar todas las rutas posibles no mide la redundancia operativa, porque varias pueden depender del mismo pasillo.
+
+## Estructura del repositorio
 
 ```text
 TeoriaGrafosTrabajo/
-├── algoritmos.py               # BFS, flujo unitario (Edmonds-Karp), descomposición y corte
-├── app.py                      # Rutas HTTP Flask (GET /, GET /casos/<id>, POST /analizar)
-├── modelo.py                   # Carga de casos y validación estricta de restricciones
-├── casos.json                  # Definición de la red original (11 nodos) y caso manual (6 nodos)
-├── verificar_informe.py        # Script de verificación y enumeración matemática exhaustiva
-├── verificacion-resultados.json# Trazas y certificados de los 5 casos validados
-├── requirements.txt            # Dependencias del proyecto (Flask y Werkzeug)
+├── algoritmos.py                 # BFS, Edmonds–Karp, descomposición de flujo y corte
+├── app.py                        # Rutas HTTP de Flask
+├── modelo.py                     # Carga de casos y validación del grafo
+├── casos.json                    # Red original y caso manual
+├── verificar_informe.py          # Verificación matemática y enumeración exhaustiva
+├── verificacion-resultados.json  # Resultados generados por el verificador
+├── requirements.txt              # Dependencia directa: Flask
+├── guia_defensa.md               # Guion para la defensa presencial
+├── relevos/T03/                  # Entradas, respuestas y comprobación HTTP de T03
 ├── static/
-│   ├── estilos.css             # Estilos de la app, paleta compartida y resaltados
-│   ├── inicio.js               # Controlador de interfaz, eventos y modos de visualización
+│   ├── estilos.css               # Estilos, paleta y resaltados
+│   ├── inicio.js                 # Estado de la interfaz y eventos
 │   └── js/
-│       ├── grafo.js            # Renderizado SVG del plano y funciones de resaltado
-│       └── posiciones.js       # Coordenadas visuales de los nodos
+│       ├── grafo.js              # Renderizado SVG y resaltado de soluciones
+│       └── posiciones.js         # Coordenadas de los vértices
 ├── templates/
-│   └── index.html              # Plantilla HTML con defs de flechas y controles
+│   └── index.html                # Plantilla y controles de la aplicación
 ├── tests/
-│   ├── test_avance.py          # Pruebas de BFS, modelo, validaciones y API
-│   └── test_flujo_unitario.py  # Pruebas de flujo, disyunción, corte y caso de cancelación
+│   ├── test_avance.py            # Modelo, BFS, validaciones y API
+│   └── test_flujo_unitario.py     # Flujo, disyunción, corte y cancelación residual
 └── informe/
-    ├── informe.tex             # Código fuente LaTeX del informe técnico completo
-    └── informe.pdf             # Informe técnico final compilado (14 páginas)
+    ├── informe.tex               # Fuente del informe técnico
+    └── informe.pdf               # Informe compilado
 ```
 
----
+## Informe técnico
 
-## 7. Compilación del informe técnico
+El informe final está disponible en [`informe/informe.pdf`](informe/informe.pdf). La fuente LaTeX está en [`informe/informe.tex`](informe/informe.tex) e incluye la modelación, los algoritmos, la red residual, los cinco escenarios, conclusiones y referencias.
 
-Para compilar el informe desde el código fuente LaTeX:
+Para recompilarlo desde la raíz del repositorio, con `pdflatex` instalado:
+
 ```bash
-cd informe
-pdflatex informe.tex
-pdflatex informe.tex
+pdflatex -output-directory=informe informe/informe.tex
+pdflatex -output-directory=informe informe/informe.tex
 ```
-El documento resultante `informe.pdf` incluye portada institucional, índice general, fundamentación teórica, caso manual con tabla de cancelación residual, conclusiones en página exclusiva y referencias académicas consolidadas.
+
+La segunda pasada actualiza el índice y las referencias cruzadas. También puedes consultar [`guia_defensa.md`](guia_defensa.md) para preparar la presentación.
+
+## Solución de problemas
+
+| Síntoma | Causa probable | Solución |
+|---|---|---|
+| `flask` no se reconoce | El entorno virtual no está activado o no se usa el intérprete del proyecto | Ejecuta `python -m flask --app app run` dentro del entorno virtual. |
+| PowerShell bloquea `Activate.ps1` | Política de ejecución de Windows | Usa `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` y vuelve a activar el entorno. |
+| El navegador no abre la aplicación | Flask no está ejecutándose o usa otro puerto | Revisa la terminal y abre la URL exacta que muestra Flask. |
+| `POST /analizar` devuelve 400 | JSON inválido, `Content-Type` incorrecto o grafo fuera de las restricciones | Envía `Content-Type: application/json` y revisa `vertices`, `entrada`, `salida` y `arcos`. |
+| Los cambios desaparecen | La aplicación no persiste datos | Es el comportamiento esperado; cada análisis recibe el grafo completo en la solicitud. |
+| `pdflatex` no se reconoce | No hay una distribución LaTeX instalada | Instala MiKTeX o TeX Live; el PDF ya está incluido en el repositorio. |
