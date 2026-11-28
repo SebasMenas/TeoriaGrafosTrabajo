@@ -349,18 +349,7 @@ El análisis de flujo máximo obtiene un valor de 2 rutas disjuntas, descomponib
 \subsection{Modificaciones y análisis comparativo}
 Para estudiar la respuesta de la red ante contingencias operativas, se contrastan dos modificaciones introducidas de forma independiente sobre $G_0$, conservando los mismos extremos $s$ y $t$:
 
-\begin{center}
-{\small
-\begin{tabularx}{\linewidth}{@{}p{.23\linewidth}ccp{.25\linewidth}cX@{}}
-\toprule
-\textbf{Configuración} & \textbf{Arcos} & \textbf{$d$} & \textbf{Camino mínimo} & \textbf{$k$} & \textbf{Corte mínimo ($C$)} \\
-\midrule
-Red original $G_0$ & 18 & 3 & $s \to A \to D \to t$ & 2 & $\{(D,t), (I,t)\}$ \\
-Bloqueo $D \to t$  & 17 & 4 & $s \to B \to F \to I \to t$ & 1 & $\{(I,t)\}$ \\
-Atajo $C \to t$    & 19 & 2 & $s \to C \to t$ & 3 & $\{(s,A), (s,B),$ $(s,C)\}$ \\
-\bottomrule
-\end{tabularx}}
-\end{center}
+La Tabla~\ref{tab:resultados} reúne los cinco escenarios y consolida la conexión, la longitud mínima, el máximo de rutas disjuntas y el corte mínimo obtenido.
 
 \tema{Bloqueo de pasillo: Menor redundancia de rutas y mayor distancia}
 Al inhabilitar el pasillo $D \to t$, el único arco de acceso a la salida pasa a ser $I \to t$. Como alcanzar $I$ demanda al menos 3 arcos, la nueva distancia mínima se incrementa a $d=4$ a través de $s \to B \to F \to I \to t$. Toda ruta dirigida debe converger obligatoriamente por el pasillo $I \to t$; en consecuencia, la familia disjunta se reduce drásticamente a $k=1$, y el corte mínimo queda conformado únicamente por $C_1 = \{(I, t)\}$ ($|C_1|=1$). La red sigue conectada (pues existe ruta alternativa para $D$ mediante $D \to F \to I \to t$), pero pierde su redundancia operativa.
@@ -434,20 +423,23 @@ Se implementó el script reproducible \texttt{verificar\_informe.py}, el cual ev
 
 \begin{center}
 {\small
-\begin{tabularx}{\linewidth}{@{}lcccccX@{}}
+\refstepcounter{table}\label{tab:resultados}
+\textbf{Tabla \thetable.} Resultados comparativos de los cinco escenarios.\par
+\vspace{2mm}
+\begin{tabularx}{\linewidth}{@{}p{.15\linewidth}cccp{.09\linewidth}p{.08\linewidth}X@{}}
 \toprule
-\textbf{Configuración} & \textbf{Activos} & \textbf{Caminos simples} & \textbf{Distancia ($d$)} & \textbf{Flujo ($k$)} & \textbf{Corte} & \textbf{Estado} \\
+\textbf{Configuración} & \textbf{Activos} & \textbf{Conexión} & \textbf{Longitud} & \textbf{Caminos simples} & \textbf{Máx. rutas} & \textbf{Corte mínimo} \\
 \midrule
-Original               & 18 & 14 & 3 & 2 & 2 & Validado con certificado \\
-Bloqueo $D \to t$      & 17 & 10 & 4 & 1 & 1 & Validado con certificado \\
-Atajo $C \to t$        & 19 & 15 & 2 & 3 & 3 & Validado con certificado \\
-Caso manual            & 7  & 3  & 3 & 2 & 2 & Validado con certificado \\
-Sin conexión           & 16 & 0  & Sin ruta & 0 & 0 & Desconexión validada \\
+Original               & 18 & Sí & 3        & 14 & 2 & $\{(D,t),$ $(I,t)\}$ \\
+Bloqueo $D \to t$      & 17 & Sí & 4        & 10 & 1 & $\{(I,t)\}$ \\
+Atajo $C \to t$        & 19 & Sí & 2        & 15 & 3 & $\{(s,A), (s,B),$ $(s,C)\}$ \\
+Caso manual            & 7  & Sí & 3        & 3  & 2 & $\{(s,a), (s,b)\}$ \\
+Sin conexión           & 16 & No & sin valor & 0  & 0 & $\varnothing$ \\
 \bottomrule
 \end{tabularx}}
 \end{center}
 
-En el caso sin conexión (bloqueo simultáneo de $D \to t$ e $I \to t$), el motor devuelve \texttt{ruta: null}, \texttt{distancia: null}, \texttt{caminos: []}, \texttt{maximo: 0} y \texttt{corte: []}. El corte vacío certifica que en la red ya modificada no es necesario bloquear ningún pasillo adicional para impedir el tránsito. Los resultados completos se registran en el archivo estructurado \texttt{verificacion-resultados.json}.
+En el caso sin conexión (bloqueo simultáneo de $D \to t$ e $I \to t$), el motor devuelve \texttt{ruta: null}, \texttt{distancia: null}, \texttt{caminos: []}, \texttt{maximo: 0}, \texttt{corte: []} y \texttt{calculos\_pendientes: []}. El corte vacío certifica que en la red ya modificada no es necesario bloquear ningún pasillo adicional para impedir el tránsito. Los resultados completos se registran en el archivo estructurado \texttt{verificacion-resultados.json}.
 
 % ==============================================================================
 % SECCIÓN 4: IMPLEMENTACIÓN Y REPRODUCCIÓN
@@ -476,7 +468,7 @@ La solución se desarrolló en Python 3 utilizando Flask para la capa de servici
 \end{center}
 
 \subsection{Interacción y contrato de análisis}
-La comunicación cliente-servidor se rige por un contrato JSON estricto mediante la ruta \texttt{POST /analizar}. La petición transfiere el estado completo: \texttt{vertices}, \texttt{entrada}, \texttt{salida} y la lista de \texttt{arcos} con su propiedad booleana \texttt{activo}.
+La comunicación cliente-servidor se rige por un contrato JSON estricto mediante la ruta \texttt{POST /analizar}. La petición transfiere el estado completo: \texttt{vertices}, \texttt{entrada}, \texttt{salida} y la lista de \texttt{arcos} con su propiedad booleana \texttt{activo}. La función \texttt{resolver} recibe el grafo completo y lee \texttt{entrada} y \texttt{salida} desde ese objeto; no recibe ambos vértices como parámetros separados.
 
 La respuesta entrega:
 \begin{itemize}[noitemsep]
@@ -485,6 +477,7 @@ La respuesta entrega:
   \item \texttt{caminos}: lista de listas de vértices correspondientes a la familia máxima disjunta.
   \item \texttt{maximo}: cardinalidad de la familia de rutas independientes ($|f_{\max}|$).
   \item \texttt{corte}: lista de arcos $[u, v]$ que conforman el corte mínimo saliente del conjunto $S$.
+  \item \texttt{calculos\_pendientes}: \texttt{[]}, que indica que no quedan cálculos diferidos.
 \end{itemize}
 
 La interfaz web incorpora una barra de controles que permite alternar dinámicamente entre la vista normal y el resaltado visual sobre el plano SVG: verde para el camino mínimo, azul y oro para las rutas disjuntas, y rojo punteado para el corte mínimo.
@@ -551,7 +544,7 @@ Como extensiones futuras para robustecer la aplicación logística, se proyecta:
 \begin{enumerate}[label={[\arabic*]},itemsep=4pt,topsep=2pt,leftmargin=7mm]
   \bibitem{enunciado} INFO1158 (2026). \emph{Proyecto 1: Simulador interactivo de laberintos y rutas alternativas}. Escuela de Informática, Universidad Católica de Temuco. Guía docente y rúbricas de evaluación, pp.~1--5.
 
-  \bibitem{cormen} Cormen, T.~H., Leiserson, C.~E., Rivest, R.~L. y Stein, C. (2022). \emph{Introduction to Algorithms}, 4.\,a edición. The MIT Press. Cap.~20 (Elementary Graph Algorithms: BFS), Cap.~24 (Maximum Flow, Ford-Fulkerson Method, Max-Flow Min-Cut Theorem).
+  \bibitem{cormen} Cormen, T.~H., Leiserson, C.~E., Rivest, R.~L. y Stein, C. (2022). \emph{Introduction to Algorithms}, 4.\,a edición. The MIT Press. Cap.~20 (Elementary Graph Algorithms: BFS), Cap.~24 (Maximum Flow, Ford-Fulkerson Method, Max-Flow Min-Cut Theorem). \href{https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/}{Ficha editorial}.
 
   \bibitem{edmondskarp} Edmonds, J. y Karp, R.~M. (1972). Theoretical Improvements in Algorithmic Efficiency for Network Flow Problems. \emph{Journal of the ACM}, 19(2), pp.~248--264. \href{https://doi.org/10.1145/321694.321699}{doi:10.1145/321694.321699}.
 
@@ -559,7 +552,7 @@ Como extensiones futuras para robustecer la aplicación logística, se proyecta:
 
   \bibitem{mitocw} Demaine, E., Ku, J. y Solomon, J. (2020). \emph{Introduction to Algorithms (6.006): Lecture 9 (BFS) \& Lecture 10 (DFS)}. MIT OpenCourseWare. \href{https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/}{ocw.mit.edu}.
 
-  \bibitem{zeh} Zeh, N. (2016). \emph{Advanced Graph Algorithms: Edmonds--Karp Algorithm, The Max-Flow Min-Cut Theorem, and Integral Flows}. Faculty of Computer Science, Dalhousie University. Material docente de algoritmos de optimización de redes.
+  \bibitem{zeh} Zeh, N. (2016). \emph{Advanced Graph Algorithms: Edmonds--Karp Algorithm, The Max-Flow Min-Cut Theorem, and Integral Flows}. Faculty of Computer Science, Dalhousie University. Material docente de algoritmos de optimización de redes. Material complementario: \href{https://web.cs.dal.ca/~nzeh/teaching/4113+6101/}{curso oficial de Advanced Algorithms (2025)}.
 
   \bibitem{pallets} Pallets Projects (2024). \emph{Flask Documentation: Quickstart and Application Test Client}. Documentación oficial técnica. \href{https://flask.palletsprojects.com/}{flask.palletsprojects.com}.
 \end{enumerate}
